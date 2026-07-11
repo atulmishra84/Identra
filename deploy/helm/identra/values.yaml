@@ -1,4 +1,3 @@
-nameOverride: ""
 fullnameOverride: "identra"
 
 image:
@@ -7,48 +6,110 @@ image:
   pullPolicy: IfNotPresent
 
 global:
-  environment: dev
+  environment: azure-dev
   tenantProfile: saas-shared
 
+# Probe path used by all Spring Boot services (actuator)
+healthPath: /actuator/health
+
 services:
-  apiGateway:
+  api-gateway:
     enabled: true
-    replicaCount: 2
+    versionTrack: v1
+    replicaCount: 1
     port: 8080
-  identityService:
+    serviceType: LoadBalancer
+  identity-service:
     enabled: true
-    replicaCount: 2
+    versionTrack: v1
+    replicaCount: 1
     port: 8081
-  provisioningService:
+  provisioning-service:
     enabled: true
-    replicaCount: 2
+    versionTrack: v1
+    replicaCount: 1
     port: 8082
-  tenantService:
+  tenant-service:
     enabled: true
+    versionTrack: v1
     replicaCount: 1
     port: 8083
-  adapterRuntime:
+  audit-service:
     enabled: true
-    replicaCount: 2
-    port: 8084
-  adminBff:
-    enabled: true
+    versionTrack: v1
     replicaCount: 1
-    port: 8088
+    port: 8084
+  adapter-runtime:
+    enabled: true
+    versionTrack: v1
+    replicaCount: 1
+    port: 8085
+  approval-service:
+    enabled: true
+    versionTrack: v1
+    replicaCount: 1
+    port: 8086
+  ai-gateway:
+    enabled: true
+    versionTrack: v2
+    replicaCount: 1
+    port: 8091
+  governance-service:
+    enabled: true
+    versionTrack: v2
+    replicaCount: 1
+    port: 8092
+  connector-factory:
+    enabled: true
+    versionTrack: v2
+    replicaCount: 1
+    port: 8093
+  identity-core-service:
+    enabled: true
+    versionTrack: v2
+    replicaCount: 1
+    port: 8094
+  migration-service:
+    enabled: true
+    versionTrack: v2
+    replicaCount: 1
+    port: 8095
+  marketplace-service:
+    enabled: true
+    versionTrack: v2
+    replicaCount: 1
+    port: 8096
+  automation-factory:
+    enabled: true
+    versionTrack: v3
+    replicaCount: 1
+    port: 8097
+  automation-runtime:
+    enabled: true
+    versionTrack: v3
+    replicaCount: 1
+    port: 8098
+  certification-service:
+    enabled: true
+    versionTrack: v3
+    replicaCount: 1
+    port: 8099
 
 ingress:
-  enabled: true
+  enabled: false
   className: nginx
   host: identra.example.com
-  tls: true
+  tls: false
 
 postgresql:
-  host: ""
-  database: identra
-  existingSecret: identra-postgres
+  jdbcUrl: ""
+  username: identra
+  existingSecret: identra-db
 
 redis:
   host: ""
+  port: "6380"
+  ssl: "true"
   existingSecret: identra-redis
 
 kafka:
@@ -56,19 +117,21 @@ kafka:
 
 resources:
   requests:
-    cpu: 100m
+    cpu: 50m
     memory: 256Mi
   limits:
     cpu: 500m
-    memory: 512Mi
+    memory: 768Mi
 
 podSecurityContext:
   runAsNonRoot: true
+  runAsUser: 10001
+  fsGroup: 10001
   seccompProfile:
     type: RuntimeDefault
 
 containerSecurityContext:
   allowPrivilegeEscalation: false
-  readOnlyRootFilesystem: true
+  readOnlyRootFilesystem: false
   capabilities:
     drop: ["ALL"]

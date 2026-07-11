@@ -1,8 +1,6 @@
 apiVersion: v2
 name: identra
-description: Identra Identity Fabric Platform umbrella chart
+description: Identra Identity Fabric (V1–V3) on Azure AKS
 type: application
-version: 0.1.0
-appVersion: "0.1.0"
-maintainers:
-  - name: Identra Platform
+version: 0.3.0
+appVersion: "0.1.0-SNAPSHOT"

@@ -3,9 +3,36 @@ kind: ConfigMap
 metadata:
   name: {{ include "identra.fullname" . }}-config
   labels:
-    app.kubernetes.io/name: identra
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "identra.labels" . | nindent 4 }}
 data:
   ENVIRONMENT: {{ .Values.global.environment | quote }}
   TENANT_PROFILE: {{ .Values.global.tenantProfile | quote }}
   KAFKA_BOOTSTRAP_SERVERS: {{ .Values.kafka.bootstrapServers | quote }}
+  IDENTRA_JWT_REQUIRED: "false"
+  IDENTRA_DB_URL: {{ .Values.postgresql.jdbcUrl | quote }}
+  IDENTRA_DB_USER: {{ .Values.postgresql.username | quote }}
+  IDENTRA_REDIS_HOST: {{ .Values.redis.host | quote }}
+  IDENTRA_REDIS_PORT: {{ .Values.redis.port | quote }}
+  IDENTRA_IDENTITY_URL: "http://{{ include "identra.fullname" . }}-identity-service:8081"
+  IDENTRA_PROVISIONING_URL: "http://{{ include "identra.fullname" . }}-provisioning-service:8082"
+  IDENTRA_TENANT_URL: "http://{{ include "identra.fullname" . }}-tenant-service:8083"
+  IDENTRA_AUDIT_URL: "http://{{ include "identra.fullname" . }}-audit-service:8084"
+  IDENTRA_ADAPTERS_URL: "http://{{ include "identra.fullname" . }}-adapter-runtime:8085"
+  IDENTRA_APPROVAL_URL: "http://{{ include "identra.fullname" . }}-approval-service:8086"
+  IDENTRA_AI_GATEWAY_URL: "http://{{ include "identra.fullname" . }}-ai-gateway:8091"
+  IDENTRA_GOVERNANCE_URL: "http://{{ include "identra.fullname" . }}-governance-service:8092"
+  IDENTRA_CONNECTOR_FACTORY_URL: "http://{{ include "identra.fullname" . }}-connector-factory:8093"
+  IDENTRA_IDENTITY_CORE_URL: "http://{{ include "identra.fullname" . }}-identity-core-service:8094"
+  IDENTRA_MIGRATION_URL: "http://{{ include "identra.fullname" . }}-migration-service:8095"
+  IDENTRA_MARKETPLACE_URL: "http://{{ include "identra.fullname" . }}-marketplace-service:8096"
+  IDENTRA_AUTOMATION_FACTORY_URL: "http://{{ include "identra.fullname" . }}-automation-factory:8097"
+  IDENTRA_AUTOMATION_RUNTIME_URL: "http://{{ include "identra.fullname" . }}-automation-runtime:8098"
+  IDENTRA_CERTIFICATION_URL: "http://{{ include "identra.fullname" . }}-certification-service:8099"
+  IDENTRA_ADAPTER_RUNTIME_URL: "http://{{ include "identra.fullname" . }}-adapter-runtime:8085"
+  IDENTRA_AI_DEFAULT_PROVIDER: "local"
+  IDENTRA_MARKETPLACE_PUBLIC: "false"
+  IDENTRA_TEMPORAL_ENABLED: "false"
+{{- if .Values.postgresql.jdbcUrl }}
+  SPRING_DATASOURCE_URL: {{ .Values.postgresql.jdbcUrl | quote }}
+  SPRING_DATASOURCE_USERNAME: {{ .Values.postgresql.username | quote }}
+{{- end }}

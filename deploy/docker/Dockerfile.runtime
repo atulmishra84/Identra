@@ -1,0 +1,14 @@
+# Runtime image for a pre-built Spring Boot jar.
+# Build jars first with Gradle, then:
+#   docker build -f deploy/docker/Dockerfile.runtime \
+#     --build-arg JAR_FILE=services/api-gateway/build/libs/api-gateway-0.1.0-SNAPSHOT.jar \
+#     -t $ACR/api-gateway:tag .
+
+FROM eclipse-temurin:21-jre-jammy
+ARG JAR_FILE
+WORKDIR /app
+RUN groupadd --system identra && useradd --system --gid identra identra
+COPY ${JAR_FILE} /app/app.jar
+USER identra
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0"
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]

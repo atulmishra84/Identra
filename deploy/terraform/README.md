@@ -1,23 +1,26 @@
 # Identra Terraform (Azure-first)
 
-Modules and environments for AKS, PostgreSQL, Redis, and supporting resources.
+Full V1–V3 platform deploy lives under `environments/dev` plus `deploy/azure/deploy.sh`.
 
 ```text
 environments/
-  dev/
-  staging/
-  prod/
+  dev/          # RG + ACR + AKS + Postgres + Redis
 modules/
   aks/
+  acr/
   postgres/
+  redis/
+  multi-region/
 ```
 
-Usage (dev):
+See [docs/AZURE.md](../../docs/AZURE.md) for the end-to-end guide.
 
 ```bash
 cd environments/dev
+cp example.tfvars terraform.tfvars
 terraform init
-terraform plan -var-file=example.tfvars
+terraform plan
+terraform apply
 ```
 
-Do not commit real `*.tfvars` with secrets.
+Do not commit real `*.tfvars` / state secrets.

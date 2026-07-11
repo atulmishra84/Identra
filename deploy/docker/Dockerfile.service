@@ -1,0 +1,23 @@
+# Multi-stage Dockerfile for Identra Spring Boot services.
+# Build context: repository root.
+# Args:
+#   SERVICE_MODULE  e.g. services:api-gateway
+#   SERVICE_DIR     e.g. services/api-gateway
+#   JAR_NAME        e.g. api-gateway-0.1.0-SNAPSHOT.jar
+
+FROM eclipse-temurin:21-jdk-jammy AS build
+ARG SERVICE_MODULE
+WORKDIR /workspace
+COPY . .
+RUN ./gradlew :${SERVICE_MODULE}:bootJar --no-daemon -x test
+
+FROM eclipse-temurin:21-jre-jammy
+ARG SERVICE_DIR
+ARG JAR_NAME
+WORKDIR /app
+RUN groupadd --system identra && useradd --system --gid identra identra
+COPY --from=build /workspace/${SERVICE_DIR}/build/libs/${JAR_NAME} /app/app.jar
+USER identra
+EXPOSE 8080
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0"
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]

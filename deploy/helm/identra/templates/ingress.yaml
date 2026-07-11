@@ -3,8 +3,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "identra.fullname" . }}
-  annotations:
-    kubernetes.k8s.io/ssl-redirect: "true"
+  labels:
+    {{- include "identra.labels" . | nindent 4 }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   rules:
@@ -15,13 +15,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ include "identra.fullname" . }}-gateway
+                name: {{ include "identra.fullname" . }}-api-gateway
                 port:
-                  number: {{ .Values.services.apiGateway.port }}
-  {{- if .Values.ingress.tls }}
-  tls:
-    - hosts:
-        - {{ .Values.ingress.host }}
-      secretName: identra-tls
-  {{- end }}
+                  number: {{ (index .Values.services "api-gateway").port }}
 {{- end }}

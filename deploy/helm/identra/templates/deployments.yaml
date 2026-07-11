@@ -1,12 +1,4 @@
-{{- range $name, $svc := dict
-  "api-gateway" .Values.apiGateway
-  "identity-service" .Values.identityService
-  "provisioning-service" .Values.provisioningService
-  "tenant-service" .Values.tenantService
-  "audit-service" .Values.auditService
-  "adapter-runtime" .Values.adapterRuntime
-  "admin-bff" .Values.adminBff
-}}
+{{- range $name, $svc := .Values.services }}
 {{- if $svc.enabled }}
 ---
 apiVersion: apps/v1
@@ -16,6 +8,7 @@ metadata:
   labels:
     {{- include "identra.labels" $ | nindent 4 }}
     app.kubernetes.io/component: {{ $name }}
+    identra.io/version-track: {{ $svc.versionTrack | default "v1" | quote }}
 spec:
   replicas: {{ $svc.replicaCount }}
   selector:
@@ -27,32 +20,44 @@ spec:
       labels:
         {{- include "identra.labels" $ | nindent 8 }}
         app.kubernetes.io/component: {{ $name }}
+        identra.io/version-track: {{ $svc.versionTrack | default "v1" | quote }}
     spec:
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ $name }}
-          image: "{{ $svc.image }}:{{ $.Values.images.tag }}"
-          imagePullPolicy: {{ $.Values.images.pullPolicy }}
+          image: "{{ $.Values.image.registry }}/{{ $name }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           ports:
-            - containerPort: {{ $svc.servicePort }}
+            - containerPort: {{ $svc.port }}
               name: http
+          envFrom:
+            - configMapRef:
+                name: {{ include "identra.fullname" $ }}-config
+            - secretRef:
+                name: {{ $.Values.postgresql.existingSecret }}
+                optional: true
+            - secretRef:
+                name: {{ $.Values.redis.existingSecret }}
+                optional: true
           securityContext:
             {{- toYaml $.Values.containerSecurityContext | nindent 12 }}
           resources:
             {{- toYaml $.Values.resources | nindent 12 }}
           livenessProbe:
             httpGet:
-              path: /actuator/health/liveness
+              path: {{ $.Values.healthPath }}
               port: http
-            initialDelaySeconds: 20
-            periodSeconds: 15
+            initialDelaySeconds: 40
+            periodSeconds: 20
+            failureThreshold: 6
           readinessProbe:
             httpGet:
-              path: /actuator/health/readiness
+              path: {{ $.Values.healthPath }}
               port: http
-            initialDelaySeconds: 10
+            initialDelaySeconds: 20
             periodSeconds: 10
+            failureThreshold: 6
 ---
 apiVersion: v1
 kind: Service
@@ -62,12 +67,13 @@ metadata:
     {{- include "identra.labels" $ | nindent 4 }}
     app.kubernetes.io/component: {{ $name }}
 spec:
+  type: {{ $svc.serviceType | default "ClusterIP" }}
   selector:
     app.kubernetes.io/instance: {{ $.Release.Name }}
     app.kubernetes.io/component: {{ $name }}
   ports:
     - name: http
-      port: {{ $svc.servicePort }}
+      port: {{ $svc.port }}
       targetPort: http
 {{- end }}
 {{- end }}
