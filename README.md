@@ -60,7 +60,24 @@ tools/          # simulators, scripts
 ### Build backend
 
 ```bash
+export JAVA_HOME=$(/usr/libexec/java_home 2>/dev/null || echo /opt/homebrew/opt/openjdk)
+export PATH="$JAVA_HOME/bin:$PATH"
 ./gradlew build
+```
+
+### Run identity + gateway (Sprint 1)
+
+```bash
+# Postgres required
+docker compose -f deploy/docker/docker-compose.yml up -d postgres
+
+./gradlew :services:identity-service:bootRun &
+./gradlew :services:api-gateway:bootRun &
+
+curl -s -X POST http://localhost:8081/v1/identities \
+  -H "Content-Type: application/json" \
+  -H "X-Tenant-Id: 11111111-1111-1111-1111-111111111111" \
+  -d '{"userName":"jdoe","active":true,"emails":[{"value":"jdoe@example.com","type":"work","primary":true}]}'
 ```
 
 ### Portal (when scaffolded)

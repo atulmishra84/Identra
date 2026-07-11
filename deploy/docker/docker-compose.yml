@@ -1,3 +1,6 @@
+# Local dependencies for Identra Sprint 1+
+# Usage: docker compose -f deploy/docker/docker-compose.yml up -d postgres redis
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -9,13 +12,24 @@ services:
       - "5432:5432"
     volumes:
       - identra-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U identra -d identra"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   kafka:
+    profiles: ["full"]
     image: bitnami/kafka:3.9
     ports:
       - "9092:9092"
@@ -30,6 +44,7 @@ services:
       ALLOW_PLAINTEXT_LISTENER: "yes"
 
   elasticsearch:
+    profiles: ["full"]
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
     environment:
       discovery.type: single-node
@@ -39,9 +54,11 @@ services:
       - "9200:9200"
 
   temporal:
+    profiles: ["full"]
     image: temporalio/auto-setup:1.25.2
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       DB: postgres12
       DB_PORT: 5432

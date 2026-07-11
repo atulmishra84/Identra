@@ -8,3 +8,4 @@
 | [0004](0004-mvp-vendor-pair.md) | MVP vendor pair: Okta + SailPoint ISC | Accepted |
 | [0005](0005-tenancy-model.md) | Multi-tenant control plane with dedicated data-plane option | Accepted |
 | [0006](0006-canonical-identity-model.md) | Canonical identity model and SCIM surface | Accepted |
+| [0008](0008-identity-core-as-adapter.md) | Identity Core implements Adapter SPI | Accepted |

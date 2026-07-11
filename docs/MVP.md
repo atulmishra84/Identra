@@ -7,8 +7,8 @@ Confirmed defaults:
 
 | Sprint | Focus |
 |--------|--------|
-| 0 (this bootstrap) | Monorepo, ADRs, OpenAPI, Helm, SPI, service skeletons, CI |
-| 1–3 | Gateway auth, tenant hardening, identity CRUD + PostgreSQL/Redis |
+| 0 (complete) | Monorepo, ADRs, OpenAPI, Helm, SPI, service skeletons, CI |
+| 1–3 (in progress) | Gateway tenant gate + JWT scaffold, identity CRUD + PostgreSQL/Flyway, SCIM Users subset |
 | 4–6 | Provisioning + Temporal + Okta adapter |
 | 7–9 | SailPoint ISC adapter + translation + swap demo |
 | 10–12 | Portal polish, audit pipeline, hardening, pilot |
