@@ -32,13 +32,15 @@ curl -H 'Host: identra.idenaccess.com' http://4.255.15.72/actuator/health
 ## DNS (do this when ready)
 
 ```text
-A  identra.idenaccess.com  ->  <ingress-ip from script>
+A  identra.idenaccess.com  ->  4.255.15.72
 ```
 
-Until then, HTTP works with a Host header:
+Then enable HTTPS redirect and wait for the cert:
 
 ```bash
-curl -H 'Host: identra.idenaccess.com' http://<ingress-ip>/
+helm upgrade identra deploy/helm/identra -n identra -f deploy/helm/identra/values-prod.yaml \
+  --reuse-values --set ingress.sslRedirect=true
+kubectl -n identra get certificate
 ```
 
 TLS (Let's Encrypt) issues automatically once DNS resolves to the ingress IP.
