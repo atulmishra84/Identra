@@ -33,6 +33,24 @@ public class GatewayProxyController {
     @Value("${identra.routes.approvals:http://localhost:8086}")
     private String approvalsBase;
 
+    @Value("${identra.routes.ai:http://localhost:8091}")
+    private String aiBase;
+
+    @Value("${identra.routes.governance:http://localhost:8092}")
+    private String governanceBase;
+
+    @Value("${identra.routes.connectorFactory:http://localhost:8093}")
+    private String connectorFactoryBase;
+
+    @Value("${identra.routes.identityCore:http://localhost:8094}")
+    private String identityCoreBase;
+
+    @Value("${identra.routes.migration:http://localhost:8095}")
+    private String migrationBase;
+
+    @Value("${identra.routes.marketplace:http://localhost:8096}")
+    private String marketplaceBase;
+
     @RequestMapping({
             "/v1/identities",
             "/v1/identities/**",
@@ -42,7 +60,12 @@ public class GatewayProxyController {
             "/v1/audit/**",
             "/v1/adapters/**",
             "/v1/approvals",
-            "/v1/approvals/**"
+            "/v1/approvals/**",
+            "/v1/ai/**",
+            "/v1/governance/**",
+            "/v1/core/**",
+            "/v1/migrations/**",
+            "/v1/marketplace/**"
     })
     public ResponseEntity<byte[]> proxy(HttpServletRequest request) {
         String path = request.getRequestURI();
@@ -91,6 +114,24 @@ public class GatewayProxyController {
         }
         if (path.startsWith("/v1/approvals")) {
             return approvalsBase;
+        }
+        if (path.startsWith("/v1/ai/connector-factory")) {
+            return connectorFactoryBase;
+        }
+        if (path.startsWith("/v1/ai")) {
+            return aiBase;
+        }
+        if (path.startsWith("/v1/governance")) {
+            return governanceBase;
+        }
+        if (path.startsWith("/v1/core")) {
+            return identityCoreBase;
+        }
+        if (path.startsWith("/v1/migrations")) {
+            return migrationBase;
+        }
+        if (path.startsWith("/v1/marketplace")) {
+            return marketplaceBase;
         }
         throw new IllegalArgumentException("No upstream for path " + path);
     }

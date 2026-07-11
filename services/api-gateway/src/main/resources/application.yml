@@ -24,3 +24,9 @@ identra:
     audit: ${IDENTRA_AUDIT_URL:http://localhost:8084}
     adapters: ${IDENTRA_ADAPTERS_URL:http://localhost:8085}
     approvals: ${IDENTRA_APPROVAL_URL:http://localhost:8086}
+    ai: ${IDENTRA_AI_GATEWAY_URL:http://localhost:8091}
+    governance: ${IDENTRA_GOVERNANCE_URL:http://localhost:8092}
+    connectorFactory: ${IDENTRA_CONNECTOR_FACTORY_URL:http://localhost:8093}
+    identityCore: ${IDENTRA_IDENTITY_CORE_URL:http://localhost:8094}
+    migration: ${IDENTRA_MIGRATION_URL:http://localhost:8095}
+    marketplace: ${IDENTRA_MARKETPLACE_URL:http://localhost:8096}

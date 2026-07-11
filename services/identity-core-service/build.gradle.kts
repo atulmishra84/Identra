@@ -6,13 +6,15 @@ plugins {
 
 dependencies {
     implementation(project(":libs:common"))
-    implementation(project(":libs:adapter-spi"))
     implementation(project(":libs:canonical-model"))
-    implementation(project(":adapters:okta"))
-    implementation(project(":adapters:sailpoint-isc"))
-    implementation(project(":adapters:entra"))
-    implementation(project(":adapters:saviynt"))
+    implementation(project(":libs:adapter-spi"))
+    implementation(project(":adapters:identity-core"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-database-postgresql")
+    runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

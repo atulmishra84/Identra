@@ -1,0 +1,17 @@
+server:
+  port: 8091
+
+spring:
+  application:
+    name: ai-gateway
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+identra:
+  ai:
+    default-provider: local
+    token-budget: ${IDENTRA_AI_TOKEN_BUDGET:100000}

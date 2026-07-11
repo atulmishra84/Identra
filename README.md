@@ -96,12 +96,13 @@ docker compose -f deploy/docker/docker-compose.yml up -d
 ## Documentation
 
 - [Architecture overview](docs/architecture/README.md)
+- [MVP plan](docs/MVP.md)
+- [v2 platform](docs/V2.md)
+- [Roadmap](docs/ROADMAP.md)
 - [ADRs](docs/adr/README.md)
 - [OpenAPI](docs/openapi/README.md)
-- [Development standards](docs/standards/development.md)
-- [Coding standards](docs/standards/coding.md)
-- [Security practices](docs/standards/security.md)
-- [AI safety](docs/standards/ai-safety.md)
+- [Pilot runbook](docs/runbooks/pilot.md)
+- [Swap demo](docs/runbooks/swap-demo.md)
 
 ## License
 
