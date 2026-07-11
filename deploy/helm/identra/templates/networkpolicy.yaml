@@ -1,0 +1,11 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "identra.fullname" . }}-default-deny-ingress
+  labels:
+    {{- include "identra.labels" . | nindent 4 }}
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  # Allow rules will be refined per-service in later sprints; skeleton establishes default-deny baseline.

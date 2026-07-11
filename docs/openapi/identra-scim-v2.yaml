@@ -1,0 +1,119 @@
+openapi: 3.1.0
+info:
+  title: Identra SCIM 2.0 Facade
+  version: 0.1.0
+  description: SCIM 2.0 Users/Groups mapped to Identra canonical identity model.
+servers:
+  - url: https://api.identra.example/scim/v2
+paths:
+  /Users:
+    get:
+      summary: Search users
+      operationId: scimSearchUsers
+      parameters:
+        - name: filter
+          in: query
+          schema:
+            type: string
+        - name: startIndex
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: count
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: ListResponse
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+    post:
+      summary: Create user
+      operationId: scimCreateUser
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /Users/{id}:
+    get:
+      summary: Get user
+      operationId: scimGetUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /Groups:
+    get:
+      summary: Search groups
+      operationId: scimSearchGroups
+      responses:
+        "200":
+          description: ListResponse
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+        userName:
+          type: string
+        active:
+          type: boolean
+        name:
+          type: object
+          additionalProperties: true
+        emails:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    ListResponse:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+        totalResults:
+          type: integer
+        startIndex:
+          type: integer
+        itemsPerPage:
+          type: integer
+        Resources:
+          type: array
+          items:
+            type: object
+            additionalProperties: true

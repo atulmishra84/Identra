@@ -1,0 +1,74 @@
+nameOverride: ""
+fullnameOverride: "identra"
+
+image:
+  registry: identra.azurecr.io
+  tag: "0.1.0-SNAPSHOT"
+  pullPolicy: IfNotPresent
+
+global:
+  environment: dev
+  tenantProfile: saas-shared
+
+services:
+  apiGateway:
+    enabled: true
+    replicaCount: 2
+    port: 8080
+  identityService:
+    enabled: true
+    replicaCount: 2
+    port: 8081
+  provisioningService:
+    enabled: true
+    replicaCount: 2
+    port: 8082
+  tenantService:
+    enabled: true
+    replicaCount: 1
+    port: 8083
+  adapterRuntime:
+    enabled: true
+    replicaCount: 2
+    port: 8084
+  adminBff:
+    enabled: true
+    replicaCount: 1
+    port: 8088
+
+ingress:
+  enabled: true
+  className: nginx
+  host: identra.example.com
+  tls: true
+
+postgresql:
+  host: ""
+  database: identra
+  existingSecret: identra-postgres
+
+redis:
+  host: ""
+  existingSecret: identra-redis
+
+kafka:
+  bootstrapServers: ""
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]

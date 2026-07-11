@@ -1,0 +1,562 @@
+openapi: 3.1.0
+info:
+  title: Identra Public API
+  version: 0.1.0
+  description: |
+    Vendor-neutral Universal Identity & Provisioning API.
+    Applications integrate with Identra — never directly with SailPoint, Okta, or other IAM products.
+  contact:
+    name: Identra Platform
+servers:
+  - url: https://api.identra.example/v1
+    description: Production
+  - url: http://localhost:8080/v1
+    description: Local
+tags:
+  - name: Identities
+  - name: Entitlements
+  - name: Roles
+  - name: Provisioning
+  - name: AccessRequests
+  - name: Approvals
+  - name: Health
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Liveness
+      operationId: getHealth
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /identities:
+    get:
+      tags: [Identities]
+      summary: List identities
+      operationId: listIdentities
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+        - name: filter
+          in: query
+          schema:
+            type: string
+        - name: startIndex
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: count
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+      responses:
+        "200":
+          description: Page of identities
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdentityList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [Identities]
+      summary: Create identity (canonical)
+      operationId: createIdentity
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Identity"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identity"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /identities/{id}:
+    get:
+      tags: [Identities]
+      summary: Get identity by id
+      operationId: getIdentity
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+        - $ref: "#/components/parameters/IdentityId"
+      responses:
+        "200":
+          description: Identity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identity"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Identities]
+      summary: Replace identity
+      operationId: replaceIdentity
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+        - $ref: "#/components/parameters/IdentityId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Identity"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identity"
+    patch:
+      tags: [Identities]
+      summary: Patch identity
+      operationId: patchIdentity
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+        - $ref: "#/components/parameters/IdentityId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IdentityPatch"
+      responses:
+        "200":
+          description: Patched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identity"
+    delete:
+      tags: [Identities]
+      summary: Delete or deactivate identity
+      operationId: deleteIdentity
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+        - $ref: "#/components/parameters/IdentityId"
+      responses:
+        "204":
+          description: Deleted
+  /entitlements:
+    get:
+      tags: [Entitlements]
+      summary: List entitlements
+      operationId: listEntitlements
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+      responses:
+        "200":
+          description: Entitlements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Entitlement"
+  /roles:
+    get:
+      tags: [Roles]
+      summary: List roles
+      operationId: listRoles
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+      responses:
+        "200":
+          description: Roles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Role"
+  /provisioning/jobs:
+    post:
+      tags: [Provisioning]
+      summary: Submit provisioning job
+      operationId: createProvisioningJob
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProvisioningRequest"
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProvisioningJob"
+    get:
+      tags: [Provisioning]
+      summary: List provisioning jobs
+      operationId: listProvisioningJobs
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+      responses:
+        "200":
+          description: Jobs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ProvisioningJob"
+  /provisioning/jobs/{jobId}:
+    get:
+      tags: [Provisioning]
+      summary: Get provisioning job
+      operationId: getProvisioningJob
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProvisioningJob"
+  /access-requests:
+    post:
+      tags: [AccessRequests]
+      summary: Create access request
+      operationId: createAccessRequest
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccessRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRequest"
+  /approvals/{taskId}/decide:
+    post:
+      tags: [Approvals]
+      summary: Approve or deny a task
+      operationId: decideApproval
+      parameters:
+        - $ref: "#/components/parameters/TenantHeader"
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovalDecision"
+      responses:
+        "200":
+          description: Decision recorded
+components:
+  parameters:
+    TenantHeader:
+      name: X-Tenant-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+    IdentityId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    BadRequest:
+      description: Bad request
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    NotFound:
+      description: Not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [UP]
+        version:
+          type: string
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        correlationId:
+          type: string
+    Identity:
+      type: object
+      required: [userName, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        externalIds:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExternalId"
+        userName:
+          type: string
+        emails:
+          type: array
+          items:
+            $ref: "#/components/schemas/Email"
+        name:
+          $ref: "#/components/schemas/Name"
+        active:
+          type: boolean
+        department:
+          type: string
+        managerId:
+          type: string
+          format: uuid
+        employmentStatus:
+          type: string
+          enum: [ACTIVE, LEAVE, TERMINATED, CONTRACTOR]
+        customAttributes:
+          type: object
+          additionalProperties: true
+        sourceSystem:
+          type: string
+        version:
+          type: integer
+        etag:
+          type: string
+    IdentityPatch:
+      type: object
+      properties:
+        active:
+          type: boolean
+        department:
+          type: string
+        managerId:
+          type: string
+          format: uuid
+        customAttributes:
+          type: object
+          additionalProperties: true
+    IdentityList:
+      type: object
+      properties:
+        totalResults:
+          type: integer
+        startIndex:
+          type: integer
+        itemsPerPage:
+          type: integer
+        Resources:
+          type: array
+          items:
+            $ref: "#/components/schemas/Identity"
+    ExternalId:
+      type: object
+      required: [system, value]
+      properties:
+        system:
+          type: string
+        value:
+          type: string
+    Email:
+      type: object
+      required: [value]
+      properties:
+        value:
+          type: string
+          format: email
+        type:
+          type: string
+        primary:
+          type: boolean
+    Name:
+      type: object
+      properties:
+        formatted:
+          type: string
+        familyName:
+          type: string
+        givenName:
+          type: string
+    Entitlement:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        applicationId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+    Role:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+    ProvisioningRequest:
+      type: object
+      required: [operation, applicationId]
+      properties:
+        operation:
+          type: string
+          enum: [CREATE, UPDATE, DISABLE, DELETE, SET_PASSWORD, ASSIGN_ENTITLEMENT, REVOKE_ENTITLEMENT]
+        applicationId:
+          type: string
+          format: uuid
+        identityId:
+          type: string
+          format: uuid
+        accountId:
+          type: string
+          format: uuid
+        attributes:
+          type: object
+          additionalProperties: true
+        entitlementIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    ProvisioningJob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [ACCEPTED, PENDING_APPROVAL, RUNNING, SUCCEEDED, FAILED, COMPENSATING]
+        operation:
+          type: string
+        retryable:
+          type: boolean
+        vendorCode:
+          type: string
+        correlationId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    AccessRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        identityId:
+          type: string
+          format: uuid
+        entitlementIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        justification:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, SUBMITTED, APPROVED, DENIED, FULFILLED, CANCELLED]
+    ApprovalDecision:
+      type: object
+      required: [decision]
+      properties:
+        decision:
+          type: string
+          enum: [APPROVE, DENY]
+        comment:
+          type: string
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://login.identra.example/oauth2/token
+          scopes:
+            identra.api: Access Identra public APIs
+security:
+  - oauth2: [identra.api]

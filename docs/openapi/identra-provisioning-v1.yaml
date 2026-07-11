@@ -1,0 +1,96 @@
+openapi: 3.1.0
+info:
+  title: Identra Provisioning API
+  version: 0.1.0
+  description: Async provisioning job contract with idempotency and compensation metadata.
+servers:
+  - url: https://api.identra.example/v1
+paths:
+  /provisioning/jobs:
+    post:
+      summary: Submit provisioning job
+      operationId: submitJob
+      parameters:
+        - name: X-Tenant-Id
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobCreate"
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+  /provisioning/jobs/{jobId}:
+    get:
+      summary: Get job status
+      operationId: getJob
+      parameters:
+        - name: X-Tenant-Id
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+components:
+  schemas:
+    JobCreate:
+      type: object
+      required: [operation, applicationId]
+      properties:
+        operation:
+          type: string
+          enum: [CREATE, UPDATE, DISABLE, DELETE, SET_PASSWORD, ASSIGN_ENTITLEMENT, REVOKE_ENTITLEMENT]
+        applicationId:
+          type: string
+          format: uuid
+        identityId:
+          type: string
+          format: uuid
+        attributes:
+          type: object
+          additionalProperties: true
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [ACCEPTED, PENDING_APPROVAL, RUNNING, SUCCEEDED, FAILED, COMPENSATING]
+        correlationId:
+          type: string
+        retryable:
+          type: boolean
+        vendorCode:
+          type: string
+        errorDetail:
+          type: string

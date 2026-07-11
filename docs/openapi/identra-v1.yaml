@@ -1,0 +1,416 @@
+openapi: 3.1.0
+info:
+  title: Identra Universal Identity & Provisioning API
+  version: 0.1.0
+  description: |
+    Vendor-neutral Identra APIs. Applications MUST integrate here, never directly with IAM vendors.
+  contact:
+    name: Identra Platform
+servers:
+  - url: https://api.identra.local
+    description: Local / cluster ingress
+tags:
+  - name: Identities
+  - name: SCIM
+  - name: Provisioning
+  - name: Adapters
+  - name: Tenants
+  - name: Audit
+paths:
+  /v1/identities/{id}:
+    get:
+      tags: [Identities]
+      summary: Get canonical identity
+      operationId: getIdentity
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Identity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Identity'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+  /scim/v2/Users:
+    get:
+      tags: [SCIM]
+      summary: List users (SCIM 2.0 subset)
+      operationId: scimListUsers
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - name: filter
+          in: query
+          schema:
+            type: string
+        - name: startIndex
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: count
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 100
+      responses:
+        '200':
+          description: SCIM ListResponse
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimListResponse'
+    post:
+      tags: [SCIM]
+      summary: Create user (SCIM 2.0 subset)
+      operationId: scimCreateUser
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/ScimUser'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimUser'
+  /scim/v2/Users/{id}:
+    get:
+      tags: [SCIM]
+      summary: Get user by id
+      operationId: scimGetUser
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimUser'
+  /v1/provisioning/jobs:
+    post:
+      tags: [Provisioning]
+      summary: Submit provisioning job (async)
+      operationId: createProvisioningJob
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - name: Idempotency-Key
+          in: header
+          schema:
+            type: string
+        - name: X-Correlation-Id
+          in: header
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProvisioningRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProvisioningJob'
+  /v1/provisioning/jobs/{jobId}:
+    get:
+      tags: [Provisioning]
+      summary: Get provisioning job status
+      operationId: getProvisioningJob
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProvisioningJob'
+  /v1/adapters:
+    get:
+      tags: [Adapters]
+      summary: List registered adapters and capabilities
+      operationId: listAdapters
+      responses:
+        '200':
+          description: Adapter list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+  /v1/adapters/{vendorKey}/health:
+    get:
+      tags: [Adapters]
+      summary: Adapter health
+      operationId: adapterHealth
+      parameters:
+        - name: vendorKey
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [okta, sailpoint-isc]
+      responses:
+        '200':
+          description: Health
+  /v1/tenants/{tenantId}:
+    get:
+      tags: [Tenants]
+      summary: Get tenant
+      operationId: getTenant
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Tenant
+  /v1/audit/events:
+    get:
+      tags: [Audit]
+      summary: List audit events
+      operationId: listAuditEvents
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      responses:
+        '200':
+          description: Events
+components:
+  parameters:
+    TenantId:
+      name: X-Tenant-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        correlationId:
+          type: string
+        retryable:
+          type: boolean
+        vendorCode:
+          type: string
+    Email:
+      type: object
+      properties:
+        value:
+          type: string
+          format: email
+        type:
+          type: string
+        primary:
+          type: boolean
+    Name:
+      type: object
+      properties:
+        formatted:
+          type: string
+        familyName:
+          type: string
+        givenName:
+          type: string
+    ExternalId:
+      type: object
+      properties:
+        system:
+          type: string
+        value:
+          type: string
+    Identity:
+      type: object
+      required: [id, tenantId, userName, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        userName:
+          type: string
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/Email'
+        name:
+          $ref: '#/components/schemas/Name'
+        active:
+          type: boolean
+        department:
+          type: string
+        managerId:
+          type: string
+          format: uuid
+        employmentStatus:
+          type: string
+        externalIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalId'
+        sourceSystem:
+          type: string
+        customAttributes:
+          type: object
+          additionalProperties: true
+        version:
+          type: integer
+          format: int64
+        etag:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ProvisioningRequest:
+      type: object
+      required: [operation, applicationKey]
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+        idempotencyKey:
+          type: string
+        operation:
+          type: string
+          enum:
+            - CREATE
+            - UPDATE
+            - DISABLE
+            - ENABLE
+            - DELETE
+            - RESET_PASSWORD
+            - ASSIGN_ENTITLEMENT
+            - REVOKE_ENTITLEMENT
+        identityId:
+          type: string
+          format: uuid
+        applicationKey:
+          type: string
+        attributes:
+          type: object
+          additionalProperties: true
+        entitlements:
+          type: object
+          additionalProperties: true
+    ProvisioningJob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        status:
+          type: string
+        operation:
+          type: string
+        identityId:
+          type: string
+          format: uuid
+        applicationKey:
+          type: string
+        correlationId:
+          type: string
+        errorDetail:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+    ScimUser:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+        userName:
+          type: string
+        active:
+          type: boolean
+        name:
+          $ref: '#/components/schemas/Name'
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/Email'
+    ScimListResponse:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+        totalResults:
+          type: integer
+        startIndex:
+          type: integer
+        itemsPerPage:
+          type: integer
+        Resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScimUser'

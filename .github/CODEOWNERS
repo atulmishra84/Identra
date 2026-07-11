@@ -1,0 +1,5 @@
+* @identra-platform
+/adapters/ @identra-adapters
+/deploy/ @identra-sre
+/docs/adr/ @identra-architecture
+/libs/adapter-spi/ @identra-architecture @identra-adapters

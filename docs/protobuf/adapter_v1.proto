@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package identra.adapter.v1;
+
+option java_multiple_files = true;
+option java_package = "com.identra.adapter.v1";
+
+// Out-of-process (Tier B) adapter contract — gRPC sidecar.
+service AdapterService {
+  rpc GetCapabilities (CapabilitiesRequest) returns (CapabilitiesResponse);
+  rpc Health (HealthRequest) returns (HealthResponse);
+}
+
+message CapabilitiesRequest {}
+
+message CapabilitiesResponse {
+  string adapter_id = 1;
+  string vendor = 2;
+  string version = 3;
+  repeated string capabilities = 4;
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+}

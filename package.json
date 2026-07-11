@@ -1,0 +1,13 @@
+{
+  "name": "identra",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:portal": "pnpm --filter @identra/portal-web dev",
+    "build:portal": "pnpm --filter @identra/portal-web build",
+    "lint:portal": "pnpm --filter @identra/portal-web lint"
+  }
+}

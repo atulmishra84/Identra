@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "identra.fullname" . }}-config
+  labels:
+    app.kubernetes.io/name: identra
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  ENVIRONMENT: {{ .Values.global.environment | quote }}
+  TENANT_PROFILE: {{ .Values.global.tenantProfile | quote }}
+  KAFKA_BOOTSTRAP_SERVERS: {{ .Values.kafka.bootstrapServers | quote }}

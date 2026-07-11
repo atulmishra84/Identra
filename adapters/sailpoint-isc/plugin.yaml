@@ -1,0 +1,18 @@
+id: sailpoint-isc
+version: 0.1.0-SNAPSHOT
+vendor: SailPoint ISC
+tier: A
+capabilities:
+  - IDENTITY_CRUD
+  - SEARCH
+  - ENTITLEMENT_ASSIGN
+  - PASSWORD_SET
+  - DISABLE
+  - DELETE
+  - FULL_SYNC
+  - DELTA_SYNC
+entrypoint: com.identra.adapter.sailpoint.isc.SailPointIscIdentityAdapter
+permissions:
+  - network.egress
+  - secrets.read
+signatureRequired: true

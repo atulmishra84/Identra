@@ -1,0 +1,65 @@
+# Build
+**/build/
+**/out/
+**/.gradle/
+**/target/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.war
+*.ear
+
+# Node / Next.js
+node_modules/
+apps/portal-web/.next/
+apps/portal-web/out/
+**/.turbo/
+*.tsbuildinfo
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# IDE
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.swp
+.DS_Store
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+secrets/
+**/application-local.yml
+**/application-secret.yml
+
+# Terraform
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+**/*.tfvars
+!**/example.tfvars
+crash.log
+
+# Helm
+**/charts/*.tgz
+**/Chart.lock
+
+# Logs / coverage
+logs/
+*.log
+coverage/
+.nyc_output/
+**/jacoco/
+
+# OS
+Thumbs.db
+
+# Cursor / local
+.cursor/
+*.local

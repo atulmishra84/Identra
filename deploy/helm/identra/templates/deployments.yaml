@@ -1,0 +1,73 @@
+{{- range $name, $svc := dict
+  "api-gateway" .Values.apiGateway
+  "identity-service" .Values.identityService
+  "provisioning-service" .Values.provisioningService
+  "tenant-service" .Values.tenantService
+  "audit-service" .Values.auditService
+  "adapter-runtime" .Values.adapterRuntime
+  "admin-bff" .Values.adminBff
+}}
+{{- if $svc.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "identra.fullname" $ }}-{{ $name }}
+  labels:
+    {{- include "identra.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+spec:
+  replicas: {{ $svc.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ $.Release.Name }}
+      app.kubernetes.io/component: {{ $name }}
+  template:
+    metadata:
+      labels:
+        {{- include "identra.labels" $ | nindent 8 }}
+        app.kubernetes.io/component: {{ $name }}
+    spec:
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ $name }}
+          image: "{{ $svc.image }}:{{ $.Values.images.tag }}"
+          imagePullPolicy: {{ $.Values.images.pullPolicy }}
+          ports:
+            - containerPort: {{ $svc.servicePort }}
+              name: http
+          securityContext:
+            {{- toYaml $.Values.containerSecurityContext | nindent 12 }}
+          resources:
+            {{- toYaml $.Values.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "identra.fullname" $ }}-{{ $name }}
+  labels:
+    {{- include "identra.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+spec:
+  selector:
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/component: {{ $name }}
+  ports:
+    - name: http
+      port: {{ $svc.servicePort }}
+      targetPort: http
+{{- end }}
+{{- end }}

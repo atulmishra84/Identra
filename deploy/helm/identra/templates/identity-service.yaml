@@ -1,0 +1,57 @@
+{{- if .Values.services.identityService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "identra.fullname" . }}-identity
+  labels:
+    app.kubernetes.io/name: identity-service
+    app.kubernetes.io/part-of: identra
+spec:
+  replicas: {{ .Values.services.identityService.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: identity-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: identity-service
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: identity-service
+          image: "{{ .Values.image.registry }}/identity-service:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.services.identityService.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "identra.fullname" . }}-config
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.services.identityService.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.services.identityService.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "identra.fullname" . }}-identity
+spec:
+  selector:
+    app.kubernetes.io/name: identity-service
+  ports:
+    - port: {{ .Values.services.identityService.port }}
+      targetPort: {{ .Values.services.identityService.port }}
+{{- end }}

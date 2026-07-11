@@ -1,0 +1,17 @@
+id: okta
+version: 0.1.0-SNAPSHOT
+vendor: Okta
+tier: A
+capabilities:
+  - IDENTITY_CRUD
+  - SEARCH
+  - ENTITLEMENT_ASSIGN
+  - PASSWORD_SET
+  - DISABLE
+  - DELETE
+  - DELTA_SYNC
+entrypoint: com.identra.adapter.okta.OktaIdentityAdapter
+permissions:
+  - network.egress
+  - secrets.read
+signatureRequired: true

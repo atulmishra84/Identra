@@ -1,0 +1,38 @@
+asyncapi: 3.0.0
+info:
+  title: Identra Events
+  version: 0.1.0
+  description: CloudEvents over Kafka for Identra domains.
+defaultContentType: application/json
+channels:
+  identityLifecycle:
+    address: identity.lifecycle
+    messages:
+      identityEvent:
+        payload:
+          type: object
+          properties:
+            specversion:
+              type: string
+            type:
+              type: string
+            source:
+              type: string
+            id:
+              type: string
+            tenantid:
+              type: string
+            data:
+              type: object
+  provisioningJobs:
+    address: provisioning.jobs
+    messages:
+      jobEvent:
+        payload:
+          type: object
+  auditEvents:
+    address: audit.events
+    messages:
+      auditEvent:
+        payload:
+          type: object

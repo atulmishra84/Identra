@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info:
+  title: Identra Admin API
+  version: 0.1.0
+  description: Operator APIs for tenants, adapters, connectors, and bindings.
+servers:
+  - url: https://api.identra.example/admin/v1
+paths:
+  /tenants:
+    get:
+      summary: List tenants
+      operationId: listTenants
+      responses:
+        "200":
+          description: Tenants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Tenant"
+  /adapters:
+    get:
+      summary: List adapter bindings
+      operationId: listAdapters
+      parameters:
+        - name: X-Tenant-Id
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Adapter bindings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AdapterBinding"
+  /connectors:
+    get:
+      summary: List connectors
+      operationId: listConnectors
+      parameters:
+        - name: X-Tenant-Id
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Connectors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Connector"
+components:
+  schemas:
+    Tenant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        deploymentProfile:
+          type: string
+          enum: [SAAS_SHARED, SAAS_DEDICATED]
+        status:
+          type: string
+          enum: [ACTIVE, SUSPENDED]
+    AdapterBinding:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        adapterType:
+          type: string
+          enum: [OKTA, SAILPOINT_ISC, IDENTITY_CORE]
+        applicationId:
+          type: string
+          format: uuid
+        enabled:
+          type: boolean
+        health:
+          type: string
+          enum: [UNKNOWN, UP, DEGRADED, DOWN]
+    Connector:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        version:
+          type: string
+        lifecycle:
+          type: string
+          enum: [DRAFT, VALIDATING, SCORED, APPROVED, PUBLISHED, DEPLOYED, DEPRECATED, RETIRED]
