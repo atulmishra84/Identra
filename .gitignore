@@ -66,3 +66,7 @@ Thumbs.db
 # Cursor / local
 .cursor/
 *.local
+
+# Terraform plan artifacts
+**/tfplan
+*.tfplan
