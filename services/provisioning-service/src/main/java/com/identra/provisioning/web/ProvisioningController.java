@@ -1,7 +1,8 @@
-package com.identra.provisioning;
+package com.identra.provisioning.web;
 
 import com.identra.canonical.ProvisioningJob;
 import com.identra.canonical.ProvisioningRequest;
+import com.identra.provisioning.service.ProvisioningOrchestrator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,19 +13,17 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Accepts provisioning requests asynchronously (202). Temporal wiring lands in Sprints 4–6.
- */
 @RestController
 @RequestMapping("/v1/provisioning/jobs")
 public class ProvisioningController {
 
-    private final Map<UUID, ProvisioningJob> jobs = new ConcurrentHashMap<>();
+    private final ProvisioningOrchestrator orchestrator;
+
+    public ProvisioningController(ProvisioningOrchestrator orchestrator) {
+        this.orchestrator = orchestrator;
+    }
 
     @PostMapping
     public ResponseEntity<ProvisioningJob> create(
@@ -33,34 +32,15 @@ public class ProvisioningController {
             @RequestHeader(value = "X-Correlation-Id", required = false) String correlationId,
             @RequestBody ProvisioningRequest request
     ) {
-        UUID jobId = UUID.randomUUID();
-        Instant now = Instant.now();
-        ProvisioningJob job = new ProvisioningJob(
-                jobId,
-                tenantId,
-                "ACCEPTED",
-                request.operation(),
-                request.identityId(),
-                request.applicationKey(),
-                correlationId != null ? correlationId : jobId.toString(),
-                null,
-                now,
-                now,
-                null
-        );
-        jobs.put(jobId, job);
+        ProvisioningJob job = orchestrator.submit(tenantId, idempotencyKey, correlationId, request);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(job);
     }
 
     @GetMapping("/{jobId}")
-    public ResponseEntity<ProvisioningJob> get(
+    public ProvisioningJob get(
             @RequestHeader("X-Tenant-Id") UUID tenantId,
             @PathVariable UUID jobId
     ) {
-        ProvisioningJob job = jobs.get(jobId);
-        if (job == null || !tenantId.equals(job.tenantId())) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(job);
+        return orchestrator.get(tenantId, jobId);
     }
 }

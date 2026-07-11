@@ -1,10 +1,18 @@
+server:
+  port: 8082
+
 spring:
   application:
     name: provisioning-service
-server:
-  port: 8082
+
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+
+identra:
+  temporal:
+    enabled: ${IDENTRA_TEMPORAL_ENABLED:false}
+    target: ${IDENTRA_TEMPORAL_TARGET:127.0.0.1:7233}
+    namespace: ${IDENTRA_TEMPORAL_NAMESPACE:default}

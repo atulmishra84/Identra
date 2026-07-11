@@ -13,8 +13,10 @@ management:
 
 identra:
   security:
-    # Set true in staging/prod once OIDC issuer is configured
-    jwt-required: false
+    jwt-required: ${IDENTRA_JWT_REQUIRED:false}
+    issuer-uri: ${IDENTRA_OIDC_ISSUER:}
+    jwk-set-uri: ${IDENTRA_OIDC_JWKS:}
+    audience: ${IDENTRA_OIDC_AUDIENCE:identra-api}
   routes:
     identity: ${IDENTRA_IDENTITY_URL:http://localhost:8081}
     provisioning: ${IDENTRA_PROVISIONING_URL:http://localhost:8082}

@@ -2,6 +2,7 @@ package com.identra.identity.service;
 
 import com.identra.canonical.Identity;
 import com.identra.canonical.IdentityWriteRequest;
+import com.identra.identity.cache.IdentityCache;
 import com.identra.identity.persistence.IdentityRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,14 +16,20 @@ import java.util.UUID;
 public class IdentityService {
 
     private final IdentityRepository repository;
+    private final IdentityCache cache;
 
-    public IdentityService(IdentityRepository repository) {
+    public IdentityService(IdentityRepository repository, IdentityCache cache) {
         this.repository = repository;
+        this.cache = cache;
     }
 
     public Identity get(UUID tenantId, UUID id) {
-        return repository.findById(tenantId, id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Identity not found"));
+        return cache.get(tenantId, id).orElseGet(() -> {
+            Identity identity = repository.findById(tenantId, id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Identity not found"));
+            cache.put(identity);
+            return identity;
+        });
     }
 
     public List<Identity> list(UUID tenantId, int startIndex, int count) {
@@ -59,7 +66,9 @@ public class IdentityService {
                 now,
                 now
         );
-        return repository.insert(identity);
+        Identity saved = repository.insert(identity);
+        cache.put(saved);
+        return saved;
     }
 
     public Identity replace(UUID tenantId, UUID id, IdentityWriteRequest request) {
@@ -84,13 +93,16 @@ public class IdentityService {
                 existing.createdAt(),
                 now
         );
-        return repository.update(updated)
+        Identity saved = repository.update(updated)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Identity was modified concurrently"));
+        cache.put(saved);
+        return saved;
     }
 
     public void delete(UUID tenantId, UUID id) {
         if (!repository.delete(tenantId, id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Identity not found");
         }
+        cache.evict(tenantId, id);
     }
 }

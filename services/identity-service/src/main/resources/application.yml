@@ -11,9 +11,14 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+    table: flyway_identity_history
   jackson:
     serialization:
       write-dates-as-timestamps: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
 
 management:
   endpoints:
@@ -25,10 +30,23 @@ management:
       probes:
         enabled: true
 
-logging:
-  pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{tenantId:-},%X{correlationId:-}]"
+identra:
+  cache:
+    redis-enabled: false
+    identity-ttl-seconds: 60
+
+---
+spring:
+  config:
+    activate:
+      on-profile: redis
+  autoconfigure:
+    exclude: []
+  data:
+    redis:
+      host: ${IDENTRA_REDIS_HOST:localhost}
+      port: ${IDENTRA_REDIS_PORT:6379}
 
 identra:
   cache:
-    identity-ttl-seconds: 60
+    redis-enabled: true

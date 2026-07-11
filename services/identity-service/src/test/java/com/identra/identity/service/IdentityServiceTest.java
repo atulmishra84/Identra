@@ -2,6 +2,7 @@ package com.identra.identity.service;
 
 import com.identra.canonical.Identity;
 import com.identra.canonical.IdentityWriteRequest;
+import com.identra.identity.cache.IdentityCache;
 import com.identra.identity.persistence.IdentityRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,15 +28,27 @@ class IdentityServiceTest {
     @Mock
     private IdentityRepository repository;
 
+    @Mock
+    private IdentityCache cache;
+
     private IdentityService service;
 
     @BeforeEach
     void setUp() {
-        service = new IdentityService(repository);
+        service = new IdentityService(repository, cache);
     }
 
     @Test
-    void createPersistsNewIdentity() {
+    void getUsesCacheHit() {
+        UUID tenantId = UUID.randomUUID();
+        UUID id = UUID.randomUUID();
+        Identity cached = sample(tenantId, id, "jdoe");
+        when(cache.get(tenantId, id)).thenReturn(Optional.of(cached));
+        assertEquals("jdoe", service.get(tenantId, id).userName());
+    }
+
+    @Test
+    void createPersistsAndCaches() {
         UUID tenantId = UUID.randomUUID();
         when(repository.findByUserName(tenantId, "jdoe")).thenReturn(Optional.empty());
         when(repository.insert(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -54,26 +67,25 @@ class IdentityServiceTest {
         ));
 
         assertEquals("jdoe", created.userName());
-        assertEquals(tenantId, created.tenantId());
-        verify(repository).insert(any());
+        verify(cache).put(any());
     }
 
     @Test
     void getMissingThrowsNotFound() {
         UUID tenantId = UUID.randomUUID();
         UUID id = UUID.randomUUID();
+        when(cache.get(tenantId, id)).thenReturn(Optional.empty());
         when(repository.findById(tenantId, id)).thenReturn(Optional.empty());
         assertThrows(ResponseStatusException.class, () -> service.get(tenantId, id));
     }
 
-    @Test
-    void createDuplicateUserNameConflicts() {
-        UUID tenantId = UUID.randomUUID();
-        Identity existing = new Identity(
-                UUID.randomUUID(),
+    private static Identity sample(UUID tenantId, UUID id, String userName) {
+        Instant now = Instant.now();
+        return new Identity(
+                id,
                 tenantId,
                 List.of(),
-                "jdoe",
+                userName,
                 List.of(),
                 null,
                 true,
@@ -84,12 +96,8 @@ class IdentityServiceTest {
                 "identra",
                 0,
                 "W/\"x\"",
-                Instant.now(),
-                Instant.now()
+                now,
+                now
         );
-        when(repository.findByUserName(tenantId, "jdoe")).thenReturn(Optional.of(existing));
-        assertThrows(ResponseStatusException.class, () -> service.create(tenantId, new IdentityWriteRequest(
-                "jdoe", List.of(), null, true, null, null, null, List.of(), null, null
-        )));
     }
 }

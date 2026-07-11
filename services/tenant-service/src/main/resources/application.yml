@@ -1,8 +1,18 @@
+server:
+  port: 8083
+
 spring:
   application:
     name: tenant-service
-server:
-  port: 8083
+  datasource:
+    url: ${IDENTRA_DB_URL:jdbc:postgresql://localhost:5432/identra}
+    username: ${IDENTRA_DB_USER:identra}
+    password: ${IDENTRA_DB_PASSWORD:identra}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    table: flyway_tenant_history
+
 management:
   endpoints:
     web:
