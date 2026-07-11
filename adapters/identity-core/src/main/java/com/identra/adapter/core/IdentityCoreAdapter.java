@@ -12,7 +12,6 @@ import java.util.UUID;
 
 /**
  * Identity Core adapter stub — Bootstrap IAM implementing the same SPI (ADR-0008).
- * Full Identity Core module ships in v2.
  */
 public class IdentityCoreAdapter implements IdentityAdapter, HealthCapable {
 
@@ -34,7 +33,7 @@ public class IdentityCoreAdapter implements IdentityAdapter, HealthCapable {
     }
 
     @Override
-    public Optional<Identity> get(UUID identityId) {
+    public Optional<Identity> getByExternalId(String externalId) {
         throw new UnsupportedOperationException("Identity Core not implemented — v2");
     }
 
@@ -49,12 +48,12 @@ public class IdentityCoreAdapter implements IdentityAdapter, HealthCapable {
     }
 
     @Override
-    public void disable(UUID identityId) {
+    public void disable(String externalId) {
         throw new UnsupportedOperationException("Identity Core not implemented — v2");
     }
 
     @Override
-    public void delete(UUID identityId) {
+    public void delete(String externalId) {
         throw new UnsupportedOperationException("Identity Core not implemented — v2");
     }
 

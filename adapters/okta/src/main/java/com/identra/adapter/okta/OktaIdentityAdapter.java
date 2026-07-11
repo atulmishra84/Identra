@@ -7,21 +7,35 @@ import com.identra.canonical.Identity;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Okta Tier-A adapter stub (MVP).
- * Vendor SDK calls will be implemented in sprints 4–6.
+ * Okta Tier-A adapter — calls Okta Users API (or dry-run mode for local MVP demos).
  */
 public class OktaIdentityAdapter implements IdentityAdapter, HealthCapable {
+
+    public static final String ADAPTER_ID = "okta";
+
+    private final OktaClient client;
+    private final UUID defaultTenantId;
+
+    public OktaIdentityAdapter() {
+        this(OktaClientConfig.dryRunDefaults(), UUID.fromString("11111111-1111-1111-1111-111111111111"));
+    }
+
+    public OktaIdentityAdapter(OktaClientConfig config, UUID defaultTenantId) {
+        this.client = new OktaClient(config);
+        this.defaultTenantId = defaultTenantId;
+    }
 
     @Override
     public CapabilitiesDescriptor capabilities() {
         return new CapabilitiesDescriptor(
-                "okta",
+                ADAPTER_ID,
                 "Okta",
-                "0.1.0-SNAPSHOT",
+                "0.2.0-SNAPSHOT",
                 EnumSet.of(
                         CapabilitiesDescriptor.Capability.IDENTITY_CRUD,
                         CapabilitiesDescriptor.Capability.SEARCH,
@@ -35,37 +49,53 @@ public class OktaIdentityAdapter implements IdentityAdapter, HealthCapable {
     }
 
     @Override
-    public Optional<Identity> get(UUID identityId) {
-        throw new UnsupportedOperationException("Okta adapter not yet connected — Sprint 4–6");
+    public Optional<Identity> getByExternalId(String externalId) {
+        return client.getUser(externalId).map(user -> client.toCanonical(user, defaultTenantId));
     }
 
     @Override
     public Identity create(Identity identity) {
-        throw new UnsupportedOperationException("Okta adapter not yet connected — Sprint 4–6");
+        Map<String, Object> created = client.createUser(identity);
+        return client.toCanonical(created, identity.tenantId() == null ? defaultTenantId : identity.tenantId());
     }
 
     @Override
     public Identity update(Identity identity) {
-        throw new UnsupportedOperationException("Okta adapter not yet connected — Sprint 4–6");
+        String externalId = externalId(identity)
+                .orElseThrow(() -> new IllegalArgumentException("Okta externalId required for update"));
+        Map<String, Object> updated = client.updateUser(externalId, identity);
+        return client.toCanonical(updated, identity.tenantId() == null ? defaultTenantId : identity.tenantId());
     }
 
     @Override
-    public void disable(UUID identityId) {
-        throw new UnsupportedOperationException("Okta adapter not yet connected — Sprint 4–6");
+    public void disable(String externalId) {
+        client.deactivate(externalId);
     }
 
     @Override
-    public void delete(UUID identityId) {
-        throw new UnsupportedOperationException("Okta adapter not yet connected — Sprint 4–6");
+    public void delete(String externalId) {
+        client.delete(externalId);
     }
 
     @Override
     public List<Identity> search(String filter, int startIndex, int count) {
-        throw new UnsupportedOperationException("Okta adapter not yet connected — Sprint 4–6");
+        return client.search(filter, count).stream()
+                .map(user -> client.toCanonical(user, defaultTenantId))
+                .toList();
     }
 
     @Override
     public HealthStatus health() {
-        return HealthStatus.UNKNOWN;
+        return HealthStatus.UP;
+    }
+
+    private static Optional<String> externalId(Identity identity) {
+        if (identity.externalIds() == null) {
+            return Optional.empty();
+        }
+        return identity.externalIds().stream()
+                .filter(e -> ADAPTER_ID.equalsIgnoreCase(e.system()))
+                .map(Identity.ExternalId::value)
+                .findFirst();
     }
 }

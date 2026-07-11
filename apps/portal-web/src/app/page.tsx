@@ -10,11 +10,11 @@ export default function HomePage() {
         so vendor migrations change adapters, not your apps.
       </p>
       <div className={styles.actions}>
-        <a className={styles.primary} href="/docs">
-          Architecture
+        <a className={styles.primary} href="/ops">
+          Ops console
         </a>
-        <a className={styles.secondary} href="https://github.com">
-          OpenAPI
+        <a className={styles.secondary} href="/docs/swap-demo">
+          Okta ↔ ISC swap demo
         </a>
       </div>
     </main>

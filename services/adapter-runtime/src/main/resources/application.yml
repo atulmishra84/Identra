@@ -1,10 +1,23 @@
+server:
+  port: 8085
+
 spring:
   application:
     name: adapter-runtime
-server:
-  port: 8084
+
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+
+identra:
+  adapters:
+    okta:
+      dry-run: ${IDENTRA_OKTA_DRY_RUN:true}
+      org-url: ${IDENTRA_OKTA_ORG_URL:https://example.okta.com}
+      api-token: ${IDENTRA_OKTA_API_TOKEN:}
+    isc:
+      dry-run: ${IDENTRA_ISC_DRY_RUN:true}
+      base-url: ${IDENTRA_ISC_BASE_URL:https://example.api.identitynow.com}
+      access-token: ${IDENTRA_ISC_ACCESS_TOKEN:}

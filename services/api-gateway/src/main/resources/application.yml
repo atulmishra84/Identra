@@ -23,3 +23,4 @@ identra:
     tenant: ${IDENTRA_TENANT_URL:http://localhost:8083}
     audit: ${IDENTRA_AUDIT_URL:http://localhost:8084}
     adapters: ${IDENTRA_ADAPTERS_URL:http://localhost:8085}
+    approvals: ${IDENTRA_APPROVAL_URL:http://localhost:8086}

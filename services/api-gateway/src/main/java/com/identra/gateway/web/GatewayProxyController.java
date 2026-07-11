@@ -10,9 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Enumeration;
 
-/**
- * Lightweight reverse proxy for local/dev until Spring Cloud Gateway routes are finalized.
- */
 @RestController
 public class GatewayProxyController {
 
@@ -33,6 +30,9 @@ public class GatewayProxyController {
     @Value("${identra.routes.adapters:http://localhost:8085}")
     private String adaptersBase;
 
+    @Value("${identra.routes.approvals:http://localhost:8086}")
+    private String approvalsBase;
+
     @RequestMapping({
             "/v1/identities",
             "/v1/identities/**",
@@ -40,7 +40,9 @@ public class GatewayProxyController {
             "/v1/provisioning/**",
             "/v1/tenants/**",
             "/v1/audit/**",
-            "/v1/adapters/**"
+            "/v1/adapters/**",
+            "/v1/approvals",
+            "/v1/approvals/**"
     })
     public ResponseEntity<byte[]> proxy(HttpServletRequest request) {
         String path = request.getRequestURI();
@@ -86,6 +88,9 @@ public class GatewayProxyController {
         }
         if (path.startsWith("/v1/adapters")) {
             return adaptersBase;
+        }
+        if (path.startsWith("/v1/approvals")) {
+            return approvalsBase;
         }
         throw new IllegalArgumentException("No upstream for path " + path);
     }

@@ -4,3 +4,21 @@ server:
 spring:
   application:
     name: audit-service
+  datasource:
+    url: ${IDENTRA_DB_URL:jdbc:postgresql://localhost:5432/identra}
+    username: ${IDENTRA_DB_USER:identra}
+    password: ${IDENTRA_DB_PASSWORD:identra}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    table: flyway_audit_history
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+identra:
+  audit:
+    kafka-enabled: ${IDENTRA_AUDIT_KAFKA_ENABLED:false}

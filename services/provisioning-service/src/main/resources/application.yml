@@ -16,3 +16,8 @@ identra:
     enabled: ${IDENTRA_TEMPORAL_ENABLED:false}
     target: ${IDENTRA_TEMPORAL_TARGET:127.0.0.1:7233}
     namespace: ${IDENTRA_TEMPORAL_NAMESPACE:default}
+  adapter-runtime-url: ${IDENTRA_ADAPTER_RUNTIME_URL:http://localhost:8085}
+  default-adapter-id: ${IDENTRA_DEFAULT_ADAPTER_ID:okta}
+  approvals:
+    required: ${IDENTRA_APPROVALS_REQUIRED:false}
+    service-url: ${IDENTRA_APPROVAL_URL:http://localhost:8086}

@@ -1,6 +1,5 @@
 rootProject.name = "identra"
 
-// Sprint 0 / MVP modules — additional services land in later sprints
 include(
     "libs:common",
     "libs:canonical-model",
@@ -14,5 +13,7 @@ include(
     "services:identity-service",
     "services:provisioning-service",
     "services:adapter-runtime",
+    "services:audit-service",
+    "services:approval-service",
     "apps:admin-bff",
 )
