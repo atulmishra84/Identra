@@ -35,4 +35,8 @@ data:
 {{- if .Values.postgresql.jdbcUrl }}
   SPRING_DATASOURCE_URL: {{ .Values.postgresql.jdbcUrl | quote }}
   SPRING_DATASOURCE_USERNAME: {{ .Values.postgresql.username | quote }}
+  SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+  SPRING_FLYWAY_BASELINE_VERSION: "0"
+  SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "2"
+  SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "0"
 {{- end }}

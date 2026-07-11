@@ -50,6 +50,7 @@ for s in "${SERVICES[@]}"; do
   image="${ACR_LOGIN_SERVER}/${s}:${TAG}"
   echo "---- ${image} (${jar})"
   docker build \
+    --platform linux/amd64 \
     -f deploy/docker/Dockerfile.runtime \
     --build-arg "JAR_FILE=${jar}" \
     -t "${image}" \

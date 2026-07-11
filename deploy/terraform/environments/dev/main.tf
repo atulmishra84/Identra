@@ -31,6 +31,12 @@ variable "location" {
   default = "eastus"
 }
 
+variable "postgres_location" {
+  type        = string
+  description = "Region for PostgreSQL Flexible Server (Sponsorship often blocks eastus)"
+  default     = "centralus"
+}
+
 variable "node_count" {
   type    = number
   default = 2
@@ -38,7 +44,7 @@ variable "node_count" {
 
 variable "node_vm_size" {
   type    = string
-  default = "Standard_B2s"
+  default = "Standard_D2s_v7"
 }
 
 variable "deploy_redis" {
@@ -89,8 +95,8 @@ module "aks" {
 
 module "postgres" {
   source                 = "../../modules/postgres"
-  name                   = "${var.prefix}-pg-${random_string.suffix.result}"
-  location               = azurerm_resource_group.identra.location
+  name                   = "${var.prefix}-pg-${random_string.suffix.result}-cus"
+  location               = var.postgres_location
   resource_group_name    = azurerm_resource_group.identra.name
   administrator_login    = "identra"
   administrator_password = random_password.postgres.result

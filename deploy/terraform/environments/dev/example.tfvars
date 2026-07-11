@@ -1,5 +1,6 @@
-prefix       = "identra"
-location     = "eastus"
-node_count   = 2
-node_vm_size = "Standard_B2s"
-deploy_redis = true
+prefix            = "identra"
+location          = "eastus"
+postgres_location = "centralus"
+node_count        = 2
+node_vm_size      = "Standard_D2s_v7"
+deploy_redis      = true

@@ -4,7 +4,8 @@ variable "name" {
 }
 
 variable "location" {
-  type = string
+  type        = string
+  description = "Azure region for PostgreSQL (may differ from AKS when offer-restricted)"
 }
 
 variable "resource_group_name" {

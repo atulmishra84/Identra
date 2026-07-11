@@ -78,7 +78,7 @@ public class GatewayProxyController {
             "/v1/automation/**",
             "/v1/certifications/**"
     })
-    public ResponseEntity<byte[]> proxy(HttpServletRequest request) {
+    public ResponseEntity<byte[]> proxy(HttpServletRequest request) throws java.io.IOException {
         String path = request.getRequestURI();
         String query = request.getQueryString();
         String base = resolveBase(path);
@@ -90,7 +90,7 @@ public class GatewayProxyController {
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String name = headerNames.nextElement();
-            if ("host".equalsIgnoreCase(name) || "content-length".equalsIgnoreCase(name)) {
+            if (isHopByHop(name)) {
                 continue;
             }
             Enumeration<String> values = request.getHeaders(name);
@@ -99,12 +99,32 @@ public class GatewayProxyController {
             }
         }
 
-        return spec.exchange((req, res) -> {
+        byte[] requestBody = request.getInputStream().readAllBytes();
+        return (requestBody.length == 0 ? spec : spec.body(requestBody)).exchange((req, res) -> {
             byte[] body = res.getBody().readAllBytes();
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            res.getHeaders().forEach((name, values) -> {
+                if (!isHopByHop(name)) {
+                    headers.put(name, values);
+                }
+            });
             return ResponseEntity.status(res.getStatusCode())
-                    .headers(res.getHeaders())
+                    .headers(headers)
                     .body(body);
         });
+    }
+
+    private static boolean isHopByHop(String name) {
+        return "host".equalsIgnoreCase(name)
+                || "content-length".equalsIgnoreCase(name)
+                || "transfer-encoding".equalsIgnoreCase(name)
+                || "connection".equalsIgnoreCase(name)
+                || "keep-alive".equalsIgnoreCase(name)
+                || "proxy-authenticate".equalsIgnoreCase(name)
+                || "proxy-authorization".equalsIgnoreCase(name)
+                || "te".equalsIgnoreCase(name)
+                || "trailers".equalsIgnoreCase(name)
+                || "upgrade".equalsIgnoreCase(name);
     }
 
     private String resolveBase(String path) {

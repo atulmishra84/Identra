@@ -1,14 +1,14 @@
 package com.identra.identity.cache;
 
 import com.identra.canonical.Identity;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Component
-@ConditionalOnMissingBean(IdentityCache.class)
+@ConditionalOnProperty(name = "identra.cache.redis-enabled", havingValue = "false", matchIfMissing = true)
 public class NoOpIdentityCache implements IdentityCache {
 
     @Override

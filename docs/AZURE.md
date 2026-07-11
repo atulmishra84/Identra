@@ -8,8 +8,8 @@ This stack provisions **all** Identra services from MVP/V1 through V3 onto a sin
 |----------|---------|
 | Resource group `identra-v123-rg` | All Identra cloud resources |
 | Azure Container Registry | Service images |
-| AKS (2× Standard_B2s) | Kubernetes runtime |
-| PostgreSQL Flexible Server (B1ms) | Identity + tenant DBs |
+| AKS (2× Standard_D2s_v7 in eastus) | Kubernetes runtime |
+| PostgreSQL Flexible Server (B1ms in centralus) | Identity + tenant DBs (centralus avoids Sponsorship eastus offer restriction) |
 | Azure Cache for Redis (Basic C0) | Optional identity cache |
 | Helm release `identra` | 16 microservices (V1–V3) |
 
@@ -71,4 +71,4 @@ terraform destroy -auto-approve
 
 ## Cost notes
 
-Dev sizing (B2s + B1ms Postgres + Basic Redis) is aimed at sponsorship/dev budgets. Scale `node_count` / SKUs in `terraform.tfvars` for staging/prod.
+Dev sizing (D2s_v7 nodes + B1ms Postgres in centralus + Basic Redis) fits Sponsorship quotas. `eastus` blocks Postgres Flexible Server (`LocationIsOfferRestricted`); AKS rejects `Standard_B2s` — use `Standard_D2s_v7`. Build images with `--platform linux/amd64`.
