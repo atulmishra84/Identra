@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "../page.module.css";
 
 type AdapterRow = {
@@ -12,14 +12,23 @@ type AdapterRow = {
 };
 
 const TENANT = "11111111-1111-1111-1111-111111111111";
-// Browser calls same-origin /identra/*; Next.js rewrites to the API gateway.
 const GATEWAY = process.env.NEXT_PUBLIC_IDENTRA_GATEWAY_URL ?? "/identra";
+
+function healthTone(health: string): "ok" | "warn" | "danger" {
+  const h = health.toLowerCase();
+  if (h.includes("up") || h.includes("healthy") || h.includes("ok")) return "ok";
+  if (h.includes("degrad") || h.includes("warn")) return "warn";
+  return "danger";
+}
 
 export default function OpsPage() {
   const [adapters, setAdapters] = useState<AdapterRow[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
     fetch(`${GATEWAY}/v1/adapters`, {
       headers: { "X-Tenant-Id": TENANT },
     })
@@ -29,50 +38,118 @@ export default function OpsPage() {
         }
         return res.json();
       })
-      .then((data) => setAdapters(Array.isArray(data) ? data : []))
-      .catch((err: Error) => setError(err.message));
+      .then((data) => {
+        if (!cancelled) {
+          setAdapters(Array.isArray(data) ? data : []);
+          setError(null);
+        }
+      })
+      .catch((err: Error) => {
+        if (!cancelled) setError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
+  const healthyCount = useMemo(
+    () => adapters.filter((a) => healthTone(a.health) === "ok").length,
+    [adapters],
+  );
+
   return (
-    <main className={styles.hero}>
-      <p className={styles.brand}>Identra</p>
-      <h1 className={styles.title}>Ops console</h1>
-      <p className={styles.lead}>
-        Adapter health and swap targets for the MVP control plane.
-      </p>
-      {error ? <p className={styles.lead}>Could not load adapters: {error}</p> : null}
-      <ul style={{ listStyle: "none", padding: 0, marginTop: "2rem", width: "100%", maxWidth: 640 }}>
-        {adapters.map((adapter) => (
-          <li
-            key={adapter.adapterId}
-            style={{
-              borderTop: "1px solid rgba(15,28,46,0.12)",
-              padding: "1rem 0",
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "1rem",
-            }}
-          >
-            <div>
-              <strong>{adapter.vendor}</strong>
-              <div style={{ opacity: 0.7, fontSize: "0.9rem" }}>
-                {adapter.adapterId} · {adapter.version}
-              </div>
-            </div>
-            <div style={{ textAlign: "right" }}>
-              <div>{adapter.health}</div>
-              <div style={{ opacity: 0.7, fontSize: "0.85rem" }}>
-                swap → {adapter.swapCompatibleWith}
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
-      <div className={styles.actions}>
-        <a className={styles.secondary} href="/">
-          Home
+    <div className={styles.opsShell}>
+      <header className={styles.opsHeader}>
+        <a className={styles.opsBrand} href="/">
+          <span className={styles.logoGlyph} aria-hidden="true" />
+          Identra
         </a>
-      </div>
-    </main>
+        <nav className={styles.opsNav} aria-label="Ops">
+          <a href="/">Home</a>
+          <span aria-current="page">Ops console</span>
+        </nav>
+      </header>
+
+      <main className={styles.opsMain}>
+        <h1 className={styles.opsTitle}>Ops console</h1>
+        <p className={styles.opsLead}>
+          Live adapter health and swap targets for the Identra control plane.
+        </p>
+
+        <div className={styles.statusRow}>
+          <span className={styles.pill}>
+            <span
+              className={`${styles.pillDot} ${error ? styles.danger : styles.ok}`}
+            />
+            {error ? "Gateway unreachable" : "Gateway connected"}
+          </span>
+          <span className={styles.pill}>
+            <span className={styles.pillDot} />
+            {loading ? "Loading adapters…" : `${adapters.length} adapters`}
+          </span>
+          {!loading && !error ? (
+            <span className={styles.pill}>
+              <span className={`${styles.pillDot} ${styles.ok}`} />
+              {healthyCount} healthy
+            </span>
+          ) : null}
+        </div>
+
+        {error ? (
+          <div className={styles.errorBanner} role="alert">
+            Could not load adapters: {error}
+          </div>
+        ) : null}
+
+        <div className={styles.tableWrap}>
+          {loading ? (
+            <>
+              <div className={styles.skeleton} />
+              <div className={styles.skeleton} />
+              <div className={styles.skeleton} />
+            </>
+          ) : adapters.length === 0 && !error ? (
+            <div className={styles.empty}>No adapters registered yet.</div>
+          ) : (
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th scope="col">Vendor</th>
+                  <th scope="col">Health</th>
+                  <th scope="col">Swap target</th>
+                </tr>
+              </thead>
+              <tbody>
+                {adapters.map((adapter) => {
+                  const tone = healthTone(adapter.health);
+                  return (
+                    <tr key={adapter.adapterId}>
+                      <td>
+                        <div className={styles.vendor}>{adapter.vendor}</div>
+                        <div className={styles.meta}>
+                          {adapter.adapterId} · v{adapter.version}
+                        </div>
+                      </td>
+                      <td>
+                        <span className={styles.health}>
+                          <span className={`${styles.pillDot} ${styles[tone]}`} />
+                          {adapter.health}
+                        </span>
+                      </td>
+                      <td className={styles.meta}>
+                        {adapter.swapCompatibleWith || "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </main>
+    </div>
   );
 }
