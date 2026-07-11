@@ -1,17 +1,18 @@
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
-import { Figtree, Syne } from "next/font/google";
+import { Instrument_Serif, Public_Sans } from "next/font/google";
 import "./globals.css";
 
-const syne = Syne({
+const instrument = Instrument_Serif({
   subsets: ["latin"],
-  variable: "--font-syne",
+  weight: "400",
+  variable: "--font-instrument",
   display: "swap",
 });
 
-const figtree = Figtree({
+const publicSans = Public_Sans({
   subsets: ["latin"],
-  variable: "--font-figtree",
+  variable: "--font-public",
   display: "swap",
 });
 
@@ -33,12 +34,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${syne.variable} ${figtree.variable}`}>
+    <html lang="en" className={`${instrument.variable} ${publicSans.variable}`}>
       <body
         style={
           {
-            "--font-display": "var(--font-syne), Syne, sans-serif",
-            "--font-body": "var(--font-figtree), Figtree, sans-serif",
+            "--font-display": "var(--font-instrument), Instrument Serif, Georgia, serif",
+            "--font-body": "var(--font-public), Public Sans, sans-serif",
           } as CSSProperties
         }
       >

@@ -90,8 +90,10 @@ export default function OpsOverviewPage() {
         {OPS_NAV.filter((item) => item.href !== "/ops").map((item) => (
           <a key={item.href} href={item.href} className={styles.moduleLink}>
             <span className={styles.moduleVersion}>{item.version}</span>
-            <strong>{item.label}</strong>
-            <p>{descriptions[item.href]}</p>
+            <div>
+              <strong>{item.label}</strong>
+              <p>{descriptions[item.href]}</p>
+            </div>
           </a>
         ))}
       </div>

@@ -1,21 +1,21 @@
 :root {
-  --ink: #0c1222;
-  --ink-soft: #1a2438;
-  --paper: #f2f4f7;
-  --mist: #e6eaef;
-  --line: rgba(12, 18, 34, 0.1);
-  --muted: #5a667a;
-  --accent: #0a7a72;
-  --accent-deep: #065f5a;
-  --accent-glow: rgba(10, 122, 114, 0.14);
-  --ok: #1a7f4b;
-  --warn: #9a6b00;
+  --ink: #0b1220;
+  --ink-soft: #1c2434;
+  --paper: #eef1f4;
+  --mist: #dde3ea;
+  --line: rgba(11, 18, 32, 0.12);
+  --muted: #5c6b7a;
+  --accent: #0d5c63;
+  --accent-deep: #094549;
+  --accent-soft: rgba(13, 92, 99, 0.1);
+  --ok: #16794c;
+  --warn: #8a6700;
   --danger: #b42318;
   --surface: #ffffff;
-  --shadow: 0 1px 0 rgba(12, 18, 34, 0.04), 0 18px 40px rgba(12, 18, 34, 0.06);
-  --font-display: "Syne", "Avenir Next", sans-serif;
-  --font-body: "Figtree", "Segoe UI", sans-serif;
+  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --font-body: "Public Sans", "Segoe UI", sans-serif;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --radius: 2px;
 }
 
 * {
@@ -27,7 +27,10 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  background: var(--paper);
+  background:
+    radial-gradient(1000px 520px at 85% -5%, rgba(13, 92, 99, 0.09), transparent 55%),
+    radial-gradient(800px 480px at -5% 20%, rgba(28, 36, 52, 0.06), transparent 50%),
+    linear-gradient(180deg, #f4f6f8 0%, var(--paper) 40%, #e9eef2 100%);
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 16px;
@@ -43,12 +46,13 @@ a {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
 ::selection {
-  background: var(--accent-glow);
+  background: var(--accent-soft);
   color: var(--ink);
 }
 

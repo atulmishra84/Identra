@@ -37,12 +37,11 @@ export function OpsShell({
     <div className={styles.opsShell}>
       <header className={styles.opsHeader}>
         <a className={styles.opsBrand} href="/">
-          <span className={styles.logoGlyph} aria-hidden="true" />
           Identra
         </a>
         <nav className={styles.opsNav} aria-label="Ops">
           <a href="/">Home</a>
-          <span aria-current="page">Platform console</span>
+          <span aria-current="page">Console</span>
         </nav>
       </header>
 
