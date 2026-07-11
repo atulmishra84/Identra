@@ -30,3 +30,6 @@ identra:
     identityCore: ${IDENTRA_IDENTITY_CORE_URL:http://localhost:8094}
     migration: ${IDENTRA_MIGRATION_URL:http://localhost:8095}
     marketplace: ${IDENTRA_MARKETPLACE_URL:http://localhost:8096}
+    automationFactory: ${IDENTRA_AUTOMATION_FACTORY_URL:http://localhost:8097}
+    automationRuntime: ${IDENTRA_AUTOMATION_RUNTIME_URL:http://localhost:8098}
+    certification: ${IDENTRA_CERTIFICATION_URL:http://localhost:8099}

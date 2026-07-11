@@ -13,5 +13,7 @@ management:
 
 identra:
   ai:
-    default-provider: local
+    default-provider: ${IDENTRA_AI_DEFAULT_PROVIDER:local}
     token-budget: ${IDENTRA_AI_TOKEN_BUDGET:100000}
+    airgap-enabled: ${IDENTRA_AI_AIRGAP_ENABLED:false}
+    airgap-endpoint: ${IDENTRA_AI_AIRGAP_ENDPOINT:http://llm.internal:8080}

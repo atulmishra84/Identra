@@ -1,8 +1,13 @@
 package com.identra.adapter.runtime.dispatch;
 
 import com.identra.adapter.entra.EntraIdentityAdapter;
+import com.identra.adapter.forgerock.ForgeRockIdentityAdapter;
+import com.identra.adapter.ibm.IbmVerifyIdentityAdapter;
+import com.identra.adapter.midpoint.MidPointIdentityAdapter;
 import com.identra.adapter.okta.OktaClientConfig;
 import com.identra.adapter.okta.OktaIdentityAdapter;
+import com.identra.adapter.oracle.OracleIamIdentityAdapter;
+import com.identra.adapter.ping.PingIdentityAdapter;
 import com.identra.adapter.sailpoint.isc.SailPointIscClientConfig;
 import com.identra.adapter.sailpoint.isc.SailPointIscIdentityAdapter;
 import com.identra.adapter.saviynt.SaviyntIdentityAdapter;
@@ -37,6 +42,11 @@ public class AdapterDispatchService {
                 new SailPointIscIdentityAdapter(new SailPointIscClientConfig(iscBaseUrl, "client", iscToken, iscDryRun), demoTenant));
         adapters.put(EntraIdentityAdapter.ADAPTER_ID, new EntraIdentityAdapter(entraDryRun, demoTenant));
         adapters.put(SaviyntIdentityAdapter.ADAPTER_ID, new SaviyntIdentityAdapter(demoTenant));
+        adapters.put(PingIdentityAdapter.ADAPTER_ID, new PingIdentityAdapter(demoTenant));
+        adapters.put(OracleIamIdentityAdapter.ADAPTER_ID, new OracleIamIdentityAdapter(demoTenant));
+        adapters.put(IbmVerifyIdentityAdapter.ADAPTER_ID, new IbmVerifyIdentityAdapter(demoTenant));
+        adapters.put(ForgeRockIdentityAdapter.ADAPTER_ID, new ForgeRockIdentityAdapter(demoTenant));
+        adapters.put(MidPointIdentityAdapter.ADAPTER_ID, new MidPointIdentityAdapter(demoTenant));
     }
 
     public AdapterDispatchResult dispatch(AdapterDispatchRequest request) {

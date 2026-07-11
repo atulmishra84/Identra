@@ -51,6 +51,15 @@ public class GatewayProxyController {
     @Value("${identra.routes.marketplace:http://localhost:8096}")
     private String marketplaceBase;
 
+    @Value("${identra.routes.automationFactory:http://localhost:8097}")
+    private String automationFactoryBase;
+
+    @Value("${identra.routes.automationRuntime:http://localhost:8098}")
+    private String automationRuntimeBase;
+
+    @Value("${identra.routes.certification:http://localhost:8099}")
+    private String certificationBase;
+
     @RequestMapping({
             "/v1/identities",
             "/v1/identities/**",
@@ -65,7 +74,9 @@ public class GatewayProxyController {
             "/v1/governance/**",
             "/v1/core/**",
             "/v1/migrations/**",
-            "/v1/marketplace/**"
+            "/v1/marketplace/**",
+            "/v1/automation/**",
+            "/v1/certifications/**"
     })
     public ResponseEntity<byte[]> proxy(HttpServletRequest request) {
         String path = request.getRequestURI();
@@ -118,6 +129,9 @@ public class GatewayProxyController {
         if (path.startsWith("/v1/ai/connector-factory")) {
             return connectorFactoryBase;
         }
+        if (path.startsWith("/v1/ai/automation-factory")) {
+            return automationFactoryBase;
+        }
         if (path.startsWith("/v1/ai")) {
             return aiBase;
         }
@@ -132,6 +146,12 @@ public class GatewayProxyController {
         }
         if (path.startsWith("/v1/marketplace")) {
             return marketplaceBase;
+        }
+        if (path.startsWith("/v1/automation")) {
+            return automationRuntimeBase;
+        }
+        if (path.startsWith("/v1/certifications")) {
+            return certificationBase;
         }
         throw new IllegalArgumentException("No upstream for path " + path);
     }

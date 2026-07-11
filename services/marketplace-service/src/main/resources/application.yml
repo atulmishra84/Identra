@@ -4,3 +4,7 @@ server:
 spring:
   application:
     name: marketplace-service
+
+identra:
+  marketplace:
+    public-enabled: ${IDENTRA_MARKETPLACE_PUBLIC:false}

@@ -1,0 +1,10 @@
+server:
+  port: 8097
+
+spring:
+  application:
+    name: automation-factory
+
+identra:
+  ai-gateway-url: ${IDENTRA_AI_GATEWAY_URL:http://localhost:8091}
+  governance-url: ${IDENTRA_GOVERNANCE_URL:http://localhost:8092}

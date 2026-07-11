@@ -26,9 +26,17 @@ public class MarketplaceController {
         this.catalogService = catalogService;
     }
 
+    @GetMapping("/status")
+    public Map<String, Object> status() {
+        return catalogService.status();
+    }
+
     @GetMapping("/items")
-    public List<Map<String, Object>> list(@RequestParam(required = false) String type) {
-        return catalogService.list(type);
+    public List<Map<String, Object>> list(
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String visibility
+    ) {
+        return catalogService.list(type, visibility);
     }
 
     @GetMapping("/items/{id}")
@@ -56,7 +64,8 @@ public class MarketplaceController {
                 String.valueOf(body.getOrDefault("type", "connector")),
                 String.valueOf(body.getOrDefault("name", "untitled")),
                 String.valueOf(body.getOrDefault("description", "")),
-                scorecard
+                scorecard,
+                body.get("visibility") == null ? null : String.valueOf(body.get("visibility"))
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(item);
     }

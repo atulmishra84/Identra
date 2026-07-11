@@ -1,0 +1,10 @@
+server:
+  port: 8098
+
+spring:
+  application:
+    name: automation-runtime
+
+identra:
+  automation:
+    dry-run: ${IDENTRA_AUTOMATION_DRY_RUN:true}

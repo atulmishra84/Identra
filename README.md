@@ -98,6 +98,7 @@ docker compose -f deploy/docker/docker-compose.yml up -d
 - [Architecture overview](docs/architecture/README.md)
 - [MVP plan](docs/MVP.md)
 - [v2 platform](docs/V2.md)
+- [v3 platform](docs/V3.md)
 - [Roadmap](docs/ROADMAP.md)
 - [ADRs](docs/adr/README.md)
 - [OpenAPI](docs/openapi/README.md)
