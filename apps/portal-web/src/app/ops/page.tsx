@@ -12,7 +12,8 @@ type AdapterRow = {
 };
 
 const TENANT = "11111111-1111-1111-1111-111111111111";
-const GATEWAY = process.env.NEXT_PUBLIC_IDENTRA_GATEWAY_URL ?? "http://localhost:8080";
+// Browser calls same-origin /identra/*; Next.js rewrites to the API gateway.
+const GATEWAY = process.env.NEXT_PUBLIC_IDENTRA_GATEWAY_URL ?? "/identra";
 
 export default function OpsPage() {
   const [adapters, setAdapters] = useState<AdapterRow[]>([]);

@@ -54,13 +54,20 @@ az aks get-credentials -g $(terraform output -raw resource_group_name) -n $(terr
 # then run the helm portion of deploy.sh, or re-run ./deploy/azure/deploy.sh
 ```
 
-## Verify
+## Portal UI (landing + ops)
+
+After deploy, the portal LoadBalancer exposes:
+
+| Page | URL |
+|------|-----|
+| Landing | `http://<portal-ip>/` |
+| Ops dashboard | `http://<portal-ip>/ops` |
 
 ```bash
-kubectl -n identra get pods
-kubectl -n identra get svc identra-api-gateway
-curl http://<EXTERNAL-IP>:8080/health
+kubectl -n identra get svc identra-portal-web
 ```
+
+Use **http** (not https) unless TLS/ingress is configured.
 
 ## Tear down
 

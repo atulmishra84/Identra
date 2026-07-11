@@ -95,6 +95,15 @@ services:
     replicaCount: 1
     port: 8099
 
+portal:
+  enabled: true
+  replicaCount: 1
+  port: 3000
+  servicePort: 80
+  serviceType: LoadBalancer
+  # In-cluster gateway service used by Next.js rewrites
+  gatewayUrl: http://identra-api-gateway:8080
+
 ingress:
   enabled: false
   className: nginx
