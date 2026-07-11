@@ -1,28 +1,30 @@
+# Production overlay for Identra on Azure AKS
+# Domain: identra.idenaccess.com (point DNS A record after ingress IP is known)
+
 fullnameOverride: "identra"
 
 image:
-  registry: identra.azurecr.io
-  tag: "0.1.0-SNAPSHOT"
-  pullPolicy: IfNotPresent
+  registry: identrag6kify.azurecr.io
+  tag: "0.3.0"
+  pullPolicy: Always
 
 global:
-  environment: azure-dev
+  environment: azure-prod
   tenantProfile: saas-shared
 
-# Probe path used by all Spring Boot services (actuator)
 healthPath: /actuator/health
 
 services:
   api-gateway:
     enabled: true
     versionTrack: v1
-    replicaCount: 1
+    replicaCount: 2
     port: 8080
-    serviceType: LoadBalancer
+    serviceType: ClusterIP
   identity-service:
     enabled: true
     versionTrack: v1
-    replicaCount: 1
+    replicaCount: 2
     port: 8081
   provisioning-service:
     enabled: true
@@ -42,7 +44,7 @@ services:
   adapter-runtime:
     enabled: true
     versionTrack: v1
-    replicaCount: 1
+    replicaCount: 2
     port: 8085
   approval-service:
     enabled: true
@@ -97,18 +99,28 @@ services:
 
 portal:
   enabled: true
-  replicaCount: 1
+  replicaCount: 2
   port: 3000
   servicePort: 80
-  serviceType: LoadBalancer
-  # In-cluster gateway service used by Next.js rewrites
+  serviceType: ClusterIP
   gatewayUrl: http://identra-api-gateway:8080
 
 ingress:
-  enabled: false
+  enabled: true
   className: nginx
-  host: identra.example.com
-  tls: false
+  host: identra.idenaccess.com
+  tls: true
+  # Keep false until DNS points to ingress; then set "true" and re-upgrade
+  sslRedirect: "false"
+  clusterIssuer: letsencrypt-prod
+  tlsSecretName: identra-tls
+
+# Security (flip jwtRequired to true after Entra app registration)
+security:
+  jwtRequired: "false"
+  oidcIssuer: "https://login.microsoftonline.com/7a570fd1-8a60-4115-9e1b-68f9102f4eab/v2.0"
+  oidcJwks: "https://login.microsoftonline.com/7a570fd1-8a60-4115-9e1b-68f9102f4eab/discovery/v2.0/keys"
+  oidcAudience: "identra-api"
 
 postgresql:
   jdbcUrl: ""
@@ -121,22 +133,13 @@ redis:
   ssl: "true"
   existingSecret: identra-redis
 
-kafka:
-  bootstrapServers: ""
-
-security:
-  jwtRequired: "false"
-  oidcIssuer: ""
-  oidcJwks: ""
-  oidcAudience: "identra-api"
-
 resources:
   requests:
     cpu: 50m
     memory: 256Mi
   limits:
-    cpu: 500m
-    memory: 768Mi
+    cpu: 750m
+    memory: 1Gi
 
 podSecurityContext:
   runAsNonRoot: true

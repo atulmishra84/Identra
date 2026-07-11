@@ -37,6 +37,12 @@ variable "database_name" {
   default = "identra"
 }
 
+variable "allow_public_postgres" {
+  type        = bool
+  description = "Allow 0.0.0.0/0 to Postgres (dev only). Disable for production."
+  default     = true
+}
+
 resource "azurerm_postgresql_flexible_server" "this" {
   name                   = var.name
   resource_group_name    = var.resource_group_name
@@ -68,7 +74,6 @@ resource "azurerm_postgresql_flexible_server_database" "identra" {
   collation = "en_US.utf8"
 }
 
-# Dev-friendly: allow Azure services + public access for AKS egress.
 resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure" {
   name             = "allow-azure-services"
   server_id        = azurerm_postgresql_flexible_server.this.id
@@ -77,6 +82,7 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure" {
 }
 
 resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_all_dev" {
+  count            = var.allow_public_postgres ? 1 : 0
   name             = "allow-all-dev"
   server_id        = azurerm_postgresql_flexible_server.this.id
   start_ip_address = "0.0.0.0"

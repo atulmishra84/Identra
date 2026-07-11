@@ -5,17 +5,57 @@ metadata:
   name: {{ include "identra.fullname" . }}
   labels:
     {{- include "identra.labels" . | nindent 4 }}
+  annotations:
+    {{- if .Values.ingress.tls }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer | default "letsencrypt-prod" | quote }}
+    {{- end }}
+    nginx.ingress.kubernetes.io/ssl-redirect: {{ .Values.ingress.sslRedirect | default "true" | quote }}
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
 spec:
   ingressClassName: {{ .Values.ingress.className }}
+  {{- if .Values.ingress.tls }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host | quote }}
+      secretName: {{ .Values.ingress.tlsSecretName | default "identra-tls" }}
+  {{- end }}
   rules:
-    - host: {{ .Values.ingress.host }}
+    - host: {{ .Values.ingress.host | quote }}
       http:
         paths:
-          - path: /
+          - path: /v1
             pathType: Prefix
             backend:
               service:
                 name: {{ include "identra.fullname" . }}-api-gateway
                 port:
                   number: {{ (index .Values.services "api-gateway").port }}
+          - path: /scim
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "identra.fullname" . }}-api-gateway
+                port:
+                  number: {{ (index .Values.services "api-gateway").port }}
+          - path: /actuator
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "identra.fullname" . }}-api-gateway
+                port:
+                  number: {{ (index .Values.services "api-gateway").port }}
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: {{ include "identra.fullname" . }}-api-gateway
+                port:
+                  number: {{ (index .Values.services "api-gateway").port }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "identra.fullname" . }}-portal-web
+                port:
+                  number: {{ .Values.portal.servicePort }}
 {{- end }}

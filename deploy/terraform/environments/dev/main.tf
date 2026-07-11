@@ -52,6 +52,11 @@ variable "deploy_redis" {
   default = true
 }
 
+variable "allow_public_postgres" {
+  type    = bool
+  default = true
+}
+
 resource "random_string" "suffix" {
   length  = 6
   upper   = false
@@ -100,6 +105,7 @@ module "postgres" {
   resource_group_name    = azurerm_resource_group.identra.name
   administrator_login    = "identra"
   administrator_password = random_password.postgres.result
+  allow_public_postgres  = var.allow_public_postgres
 }
 
 module "redis" {
@@ -108,6 +114,26 @@ module "redis" {
   name                = "${var.prefix}-redis-${random_string.suffix.result}"
   location            = azurerm_resource_group.identra.location
   resource_group_name = azurerm_resource_group.identra.name
+}
+
+module "keyvault" {
+  source              = "../../modules/keyvault"
+  name                = "${replace(var.prefix, "-", "")}kv${random_string.suffix.result}"
+  location            = azurerm_resource_group.identra.location
+  resource_group_name = azurerm_resource_group.identra.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  postgres_password   = random_password.postgres.result
+  redis_primary_key   = var.deploy_redis ? module.redis[0].primary_access_key : ""
+}
+
+data "azurerm_client_config" "current" {}
+
+output "key_vault_name" {
+  value = module.keyvault.name
+}
+
+output "key_vault_uri" {
+  value = module.keyvault.uri
 }
 
 output "resource_group_name" {

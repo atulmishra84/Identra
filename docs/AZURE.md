@@ -56,18 +56,9 @@ az aks get-credentials -g $(terraform output -raw resource_group_name) -n $(terr
 
 ## Portal UI (landing + ops)
 
-After deploy, the portal LoadBalancer exposes:
+**Production hostname:** `identra.idenaccess.com` (see [PRODUCTION.md](PRODUCTION.md)).
 
-| Page | URL |
-|------|-----|
-| Landing | `http://<portal-ip>/` |
-| Ops dashboard | `http://<portal-ip>/ops` |
-
-```bash
-kubectl -n identra get svc identra-portal-web
-```
-
-Use **http** (not https) unless TLS/ingress is configured.
+Until DNS is updated, use the ingress IP with a Host header, or the temporary LoadBalancer IPs if still present.
 
 ## Tear down
 

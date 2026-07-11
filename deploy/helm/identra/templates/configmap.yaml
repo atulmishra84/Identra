@@ -8,7 +8,10 @@ data:
   ENVIRONMENT: {{ .Values.global.environment | quote }}
   TENANT_PROFILE: {{ .Values.global.tenantProfile | quote }}
   KAFKA_BOOTSTRAP_SERVERS: {{ .Values.kafka.bootstrapServers | quote }}
-  IDENTRA_JWT_REQUIRED: "false"
+  IDENTRA_JWT_REQUIRED: {{ .Values.security.jwtRequired | default "false" | quote }}
+  IDENTRA_OIDC_ISSUER: {{ .Values.security.oidcIssuer | default "" | quote }}
+  IDENTRA_OIDC_JWKS: {{ .Values.security.oidcJwks | default "" | quote }}
+  IDENTRA_OIDC_AUDIENCE: {{ .Values.security.oidcAudience | default "identra-api" | quote }}
   IDENTRA_DB_URL: {{ .Values.postgresql.jdbcUrl | quote }}
   IDENTRA_DB_USER: {{ .Values.postgresql.username | quote }}
   IDENTRA_REDIS_HOST: {{ .Values.redis.host | quote }}
