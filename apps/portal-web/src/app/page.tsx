@@ -11,7 +11,8 @@ export default function HomePage() {
         </a>
         <nav className={styles.nav} aria-label="Primary">
           <a href="#platform">Platform</a>
-          <a href="/ops">Ops</a>
+          <a href="#releases">V1–V3</a>
+          <a href="/ops">Console</a>
           <a className={styles.navCta} href="/ops">
             Open console
           </a>
@@ -33,10 +34,10 @@ export default function HomePage() {
             </p>
             <div className={styles.actions}>
               <a className={styles.primary} href="/ops">
-                Ops console
+                Platform console
               </a>
-              <a className={styles.secondary} href="#platform">
-                See how it works
+              <a className={styles.secondary} href="#releases">
+                Explore V2 &amp; V3
               </a>
             </div>
           </div>
@@ -79,12 +80,50 @@ export default function HomePage() {
             </li>
           </ol>
         </section>
+
+        <section id="releases" className={styles.versionSection}>
+          <p className={styles.sectionEyebrow}>Releases</p>
+          <h2 className={styles.sectionTitle}>V1 Fabric. V2 Platform. V3 Scale.</h2>
+          <p className={styles.sectionLead}>
+            Every release is live in the console — adapters, AI factories,
+            marketplace, migrations, automation, and certifications.
+          </p>
+          <div className={styles.versionGrid}>
+            <div className={styles.versionBlock}>
+              <h3>V1 — Identity Fabric</h3>
+              <ul>
+                <li>Vendor-neutral APIs &amp; SCIM</li>
+                <li>Adapter catalog &amp; health</li>
+                <li>Swap-compatible routing</li>
+              </ul>
+              <a href="/ops/adapters">Open adapters →</a>
+            </div>
+            <div className={styles.versionBlock}>
+              <h3>V2 — AI Platform</h3>
+              <ul>
+                <li>Connector factory &amp; AI gateway</li>
+                <li>Governance scorecards</li>
+                <li>Migrations, marketplace, Identity Core</li>
+              </ul>
+              <a href="/ops/marketplace">Open marketplace →</a>
+            </div>
+            <div className={styles.versionBlock}>
+              <h3>V3 — Automation &amp; Cert</h3>
+              <ul>
+                <li>Automation factory (Playwright+)</li>
+                <li>Access certification campaigns</li>
+                <li>SoD evaluation &amp; full vendor catalog</li>
+              </ul>
+              <a href="/ops/automation">Open automation →</a>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer className={styles.footer}>
         <span className={styles.footerBrand}>Identra</span>
-        <span className={styles.footerMeta}>Identity Fabric Platform</span>
-        <a href="/ops">Ops console →</a>
+        <span className={styles.footerMeta}>Identity Fabric Platform · V1–V3</span>
+        <a href="/ops">Platform console →</a>
       </footer>
     </div>
   );

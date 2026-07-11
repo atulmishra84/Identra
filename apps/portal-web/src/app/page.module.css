@@ -128,11 +128,20 @@
   border-radius: 0.4rem;
   font-weight: 600;
   font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
   transition:
     transform 0.25s var(--ease),
     background 0.25s var(--ease),
     border-color 0.25s var(--ease),
     box-shadow 0.25s var(--ease);
+}
+
+.primary:disabled,
+.secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .primary {
@@ -346,25 +355,242 @@
 
 .opsMain {
   flex: 1;
-  padding: clamp(1.75rem, 4vh, 2.75rem) clamp(1.25rem, 4vw, 3rem);
-  max-width: 960px;
-  width: 100%;
-  margin: 0 auto;
+  padding: clamp(1.5rem, 3vh, 2.25rem) clamp(1.25rem, 3vw, 2.5rem);
+  min-width: 0;
   animation: rise 0.7s var(--ease) both;
+}
+
+.opsLayout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 0;
+  flex: 1;
+  align-items: stretch;
+}
+
+.opsAside {
+  padding: 1.25rem 1rem 2rem 1.25rem;
+  border-right: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+
+.navGroup {
+  margin-bottom: 1.25rem;
+}
+
+.navGroupLabel {
+  margin: 0 0 0.45rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.navList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navLink,
+.navLinkActive {
+  display: block;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.navLink:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--mist) 70%, transparent);
+}
+
+.navLinkActive {
+  color: var(--ink);
+  font-weight: 600;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.moduleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.moduleLink {
+  display: block;
+  padding: 1.1rem 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.moduleLink:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+}
+
+.moduleVersion {
+  display: inline-block;
+  margin-bottom: 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.moduleLink strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.3rem;
+}
+
+.moduleLink p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.panelTitle {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.fieldWide {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.field input,
+.field select,
+.field textarea {
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  padding: 0.65rem 0.75rem;
+  background: #fbfcfd;
+  color: var(--ink);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: 2px solid var(--accent-glow);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+
+.formActions {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.resultBox {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.45rem;
+  background: #f7f8fa;
+  border: 1px solid var(--line);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--ink-soft);
+  max-height: 280px;
+  overflow: auto;
+}
+
+.versionSection {
+  padding: clamp(3rem, 8vh, 5rem) clamp(1.25rem, 4vw, 3rem);
+  border-top: 1px solid var(--line);
+}
+
+.versionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.versionBlock {
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.versionBlock h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: -0.025em;
+}
+
+.versionBlock ul {
+  margin: 0 0 1rem;
+  padding-left: 1.1rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.versionBlock a {
+  font-weight: 600;
+  color: var(--accent-deep);
 }
 
 .opsTitle {
   margin: 0 0 0.4rem;
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-size: clamp(1.55rem, 2.6vw, 2rem);
   font-weight: 700;
   letter-spacing: -0.04em;
 }
 
 .opsLead {
-  margin: 0 0 1.75rem;
+  margin: 0 0 1.5rem;
   color: var(--muted);
-  max-width: 36rem;
+  max-width: 40rem;
 }
 
 .statusRow {
@@ -574,5 +800,30 @@
 
   .nav a:not(.navCta) {
     display: none;
+  }
+
+  .opsLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .opsAside {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.75rem;
+  }
+
+  .navGroup {
+    margin-bottom: 0.75rem;
+  }
+
+  .navList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .formGrid,
+  .versionGrid {
+    grid-template-columns: 1fr;
   }
 }
